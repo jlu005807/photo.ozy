@@ -1,0 +1,346 @@
+/* Photo Gallery stylesheet - 半透明卡片式照片画廊 */
+
+/* 定义玻璃感相关的变量 */
+:root {
+  --glass-border: rgba(255, 255, 255, 0.2); /* 玻璃感边框：光亮半透明 */
+  --glass-bg: rgba(255, 255, 255, 0.1); /* 玻璃背景：极浅的半透明白 */
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); /* 玻璃阴影 */
+  --glass-highlight: rgba(255, 255, 255, 0.05); /* 玻璃高光 */
+  --hover-glass-border: rgba(255, 127, 80, 0.4); /* 悬停时的玻璃边框 */
+  --hover-glass-highlight: rgba(255, 127, 80, 0.1); /* 悬停时的高光 */
+}
+
+html {
+  scroll-behavior: smooth; /* 平滑滚动效果 */
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: linear-gradient(135deg, #1a1a1a, #333); /* 渐变背景增强玻璃效果的对比度 */
+  color: #f5f5f5;
+  min-height: 100vh;
+  margin: 0;
+  padding: 20px 0;
+}
+h1 {
+  color: coral;
+  margin-bottom: 2rem;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
+}
+
+h2 {
+  color: coral;
+  margin: 3rem 0 1.5rem;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
+  text-align: center;
+  width: 100%;
+}
+.grid-container {
+  /* increase base column width so folded (column) layout shows larger thumbnails */
+  columns: 4 240px; /* 减少列数，增加每列宽度 */
+  /* increase horizontal spacing between columns */
+  column-gap: 3rem; /* 增加列间距从2rem到3rem */
+  width: 92%; /* 略微增大宽度以保持边距均衡 */
+  margin: 0 auto;
+  position: relative; /* 为子元素的定位提供参考 */
+}
+
+/* 确保图片容器可点击 */
+.grid-container .image-wrapper {
+  cursor: pointer;
+}
+
+/* 图片保持完全不透明 - 增强选择器优先级 */
+.grid-container .image-wrapper img {
+  width: 100%;
+  border-radius: 5px;
+  transition: all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  opacity: 1 !important; /* 确保图片不透明 */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* 给图片加一点微妙的阴影 */
+}
+
+/* 文字也保持完全不透明 */
+.grid-container .image-wrapper p {
+  margin: 10px 0 5px;
+  padding: 0;
+  text-align: center;
+  font-style: italic;
+  color: #e0e0e0;
+  font-size: 0.95rem;
+  opacity: 1 !important; /* 确保文字不透明 */
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4); /* 增强文字可读性 */
+}
+
+/* Lightbox 弹出层样式 */
+
+.lightbox {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.75);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.5s cubic-bezier(0.19, 1, 0.22, 1), visibility 0.5s;
+}
+
+.lightbox.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: all;
+}
+
+.lightbox-content {
+  --lb-padding: 22px; /* padding variable so buttons can align to visual content */
+  background: rgba(30, 30, 30, 0.7); /* 半透明背景 */
+  backdrop-filter: blur(15px); /* 背景模糊效果 - 玻璃感 */
+  -webkit-backdrop-filter: blur(15px); /* Safari兼容性 */
+  border: 1px solid rgba(255, 255, 255, 0.15); /* 玻璃边框 */
+  padding: var(--lb-padding);
+  border-radius: 20px; /* 更圆的边角 */
+  max-width: 90%; 
+  max-height: 85vh;
+  /* allow absolutely-positioned button container to escape the content box */
+  overflow: visible;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+  position: relative;
+  display: block; /* ensure it fills the wrapper's width */
+  width: 100%;
+  box-sizing: border-box; /* include padding/border in width calculations */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transform: scale(0.9);
+  opacity: 0;
+  transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1), 
+              opacity 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* 内层包装：用于把按钮定位为相对于内容的上方 */
+.lightbox-inner {
+  position: relative; /* 使内部绝对定位相对于此块 */
+  display: inline-block; /* shrink-wrap 内容宽度 */
+  max-width: 90%; /* 增加到与内容宽度一致 */
+  width: auto; /* 保持包裹内容宽度，以便按钮能与内容右边界对齐 */
+  box-sizing: border-box; /* make width calculations reliable */
+}
+
+/* 按钮容器 - 绝对定位，相对于 .lightbox-content 的右上方（直接子元素） */
+.lightbox-content > .button-container {
+  position: absolute;
+  bottom: calc(100% + 12px); /* 放在 .lightbox-content 顶部上方，留 12px 间隙 */
+  /* 把按钮右边界对齐到内容可视区域（不含 padding） */
+  /* nudge a bit to the right: reduce the right offset so container sits slightly beyond content edge */
+  right: calc(var(--lb-padding) - 8px);
+  display: flex;
+  gap: 10px;
+  z-index: 1500;
+  opacity: 0;
+  transition: opacity 0.18s ease 0.08s, transform 0.18s ease;
+  transform: translateY(-6px);
+  pointer-events: none; /* 默认不可交互，激活时启用 */
+}
+
+/* 内容和按钮在lightbox激活时显示 */
+.lightbox.active .lightbox-content {
+  transform: scale(1.01); /* 略微放大显示更大的图片 */
+  opacity: 1;
+}
+
+.lightbox.active .lightbox-content > .button-container {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto; /* 激活时允许交互 */
+}
+
+/* 当视口较窄时，减小偏移以避免超出 */
+@media (max-width: 480px) {
+  .lightbox-inner {
+    max-width: 92%;
+  }
+  .lightbox-content > .button-container {
+    bottom: calc(100% + 8px);
+  /* mobile: smaller nudge to the right */
+  right: calc(var(--lb-padding) - 8px);
+  }
+}
+
+.lightbox-img {
+  display: block; /* 默认显示 */
+  max-width: 100%;
+  max-height: 80vh; /* 增加最大高度以显示更大的图片 */
+  width: auto;
+  height: auto;
+  margin: 0 auto;
+  border-radius: 6px;
+  filter: none;
+  object-fit: contain; /* 确保图片始终保持比例 */
+  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.4); /* 添加阴影增强立体感 */
+  transform: scale(1); /* 初始大小 */
+  transition: transform 0.3s ease; /* 平滑过渡 */
+}
+
+.lightbox-text {
+  margin-top: 15px;
+  padding: 0;
+  text-align: center;
+  font-style: italic;
+  color: #f0f0f0;
+  font-size: 1.2em;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* 图片包装器样式 - 玻璃感效果 */
+.grid-container .image-wrapper {
+  display: inline-block !important;
+  width: 100% !important;
+  border: solid 1px var(--glass-border) !important; /* 玻璃边框 */
+  padding: 12px 14px !important; /* 增加左右填充 */
+  box-shadow: var(--glass-shadow) !important; /* 玻璃阴影 */
+  border-radius: 16px !important; /* 更圆的边角增强玻璃感 */
+  transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1) !important;
+  background: linear-gradient(135deg, var(--glass-highlight), var(--glass-bg)) !important; /* 渐变背景增强玻璃感 */
+  backdrop-filter: blur(10px) !important; /* 背景模糊效果 - 关键的玻璃效果 */
+  -webkit-backdrop-filter: blur(10px) !important; /* Safari兼容性 */
+  margin: 0 0.6rem 1.8rem 0.6rem !important; /* 增加左右边距，也略微增加下边距 */
+  overflow: hidden !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* 添加玻璃高光效果 */
+.grid-container .image-wrapper::before {
+  content: "" !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 50% !important; /* 高光只占上半部分 */
+  background: linear-gradient(to bottom, var(--glass-highlight), transparent) !important;
+  opacity: 0.3 !important;
+  pointer-events: none !important; /* 不干扰鼠标事件 */
+  z-index: -1 !important;
+}
+
+/* 悬停效果 - 增强区分度 */
+.grid-container .image-wrapper:hover {
+  border-color: rgba(255, 127, 80, 0.8); /* 半透明的珊瑚色边框 */
+  transform: scale(1.03);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4); /* 半透明阴影 */
+  background-color: rgba(51, 51, 51, 0.7); /* 悬停时背景色略深 */
+  z-index: 1;
+}
+
+main {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 0;
+  overflow-x: hidden; /* 防止水平溢出 */
+  position: relative; /* 为子元素定位提供参考 */
+  box-sizing: border-box;
+}
+
+footer {
+  margin-top: 2rem;
+  text-align: center;
+  opacity: 0.7;
+  color: #aaa;
+  font-size: 0.9rem;
+  width: 100%;
+  padding: 1rem 0;
+}
+
+.close-button, .download-button {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 2px solid rgba(255,255,255,0.5);
+  box-shadow: 0 3px 12px rgba(0,0,0,0.8);
+  transition: transform .15s ease, background-color .15s ease;
+  position: relative;
+  z-index: 1600;
+}
+
+.close-button {
+  background: rgba(255,69,87,0.9);
+}
+
+.download-button {
+  background: rgba(46,204,113,0.9);
+}
+
+/* hover & focus states */
+.close-button:hover, .close-button:focus,
+.download-button:hover, .download-button:focus {
+  transform: scale(1.06);
+  border-color: rgba(255,255,255,0.7);
+}
+
+/* visible focus ring for keyboard users */
+.close-button:focus, .download-button:focus {
+  outline: 3px solid rgba(255,255,255,0.12);
+  outline-offset: 3px;
+}
+
+.close-button:before, .close-button:after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 2px;
+  background-color: rgba(255, 255, 255, 0.9);
+  /* center the cross lines inside the circular button */
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.close-button:before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.close-button:after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+/* 下载按钮图标 */
+.download-button:before {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 8px solid rgba(255, 255, 255, 0.9);
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.download-button:after {
+  content: '';
+  position: absolute;
+  width: 2px;
+  height: 10px;
+  background-color: rgba(255, 255, 255, 0.9);
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+
+
