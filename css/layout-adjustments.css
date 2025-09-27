@@ -1,0 +1,18 @@
+/* 主容器样式调整 */
+main {
+  position: relative;
+  padding-top: 60px; /* 为右上角按钮留出空间 */
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .gallery-switcher {
+    position: static;
+    justify-content: center;
+    margin: 1rem 0 2rem;
+  }
+  
+  main {
+    padding-top: 20px;
+  }
+}

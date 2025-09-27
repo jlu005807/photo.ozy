@@ -7,12 +7,19 @@
   /* switch to dark background and light text for better contrast */
   background: #121212;
   color: #efecdb;
-  min-height: 100vh;
+  height: calc(100vh - 60px); /* 减少高度，为顶部按钮留出空间 */
   width: 100vw; /* 使用视口宽度来铺满整个水平方向 */
   margin-left: calc(-50vw + 50%); /* 向左偏移，使其居中并铺满屏幕 */
   box-sizing: border-box;
-  margin-top: 2rem;
-  margin-bottom: 2rem;
+  margin-top: 0;
+  margin-bottom: 0;
+  position: fixed; /* 在激活时固定到视口上 */
+  top: 100px; /* 从顶部偏移，为按钮留出空间 */
+  left: 0;
+  z-index: 100; /* 确保在其他内容之上 */
+  opacity: 0; /* 初始不可见 */
+  pointer-events: none; /* 初始不响应交互 */
+  transition: opacity 0.3s ease;
 }
 
 /* remove default page margins and set page background to match gallery
@@ -21,6 +28,111 @@ html, body {
   height: 100%;
   margin: 0;
   background: #121212;
+}
+
+/* 当水平视差画廊处于激活状态时 */
+#parallax-gallery.active .hp-gallery {
+  opacity: 1;
+  pointer-events: all; /* 允许交互 */
+}
+
+/* 当水平视差画廊激活时，阻止身体滚动 */
+body.parallax-active {
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* 导航提示样式 */
+.hp-gallery .hp-gallery-scroll-info {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 12px 20px;
+  border-radius: 50px;
+  z-index: 1001;
+  opacity: 0;
+  transition: all 0.5s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  animation: fadeInUp 1s forwards 0.5s;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 20px);
+  }
+  to {
+    opacity: 0.9;
+    transform: translate(-50%, 0);
+  }
+}
+
+.hp-gallery .hp-gallery-scroll-info:hover {
+  opacity: 1;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  transform: translate(-50%, -3px);
+}
+
+.hp-gallery .hp-gallery-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin: 0 12px;
+  color: rgba(255, 255, 255, 0.9);
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.hp-gallery .hp-gallery-icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  stroke: currentColor;
+}
+
+.hp-gallery .hp-gallery-icon-left {
+  animation: bounceLeft 1.5s infinite alternate;
+}
+
+.hp-gallery .hp-gallery-icon-right {
+  animation: bounceRight 1.5s infinite alternate;
+}
+
+@keyframes bounceLeft {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-5px);
+  }
+}
+
+@keyframes bounceRight {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+}
+
+.hp-gallery .hp-gallery-text {
+  color: white;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.8px;
+  text-align: center;
+  margin: 0 5px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 .hp-gallery * {
   box-sizing: border-box;
@@ -38,16 +150,17 @@ html, body {
 }
 .hp-gallery .hp-gallery-external {
   overflow: hidden;
-  height: 100vh;
+  height: calc(100vh - 60px); /* 使用调整后的高度 */
   width: 100%; /* 确保宽度占满父容器 */
+  position: relative; /* 确保可以正确定位子元素 */
 }
 
 .hp-gallery .hp-gallery-horizontal-scroll-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100vh; /* 保持与高度相关的宽度 */
-  transform: rotate(-90deg) translate3d(0,-100vh,0);
+  width: calc(100vh - 60px); /* 使用调整后的高度 */
+  transform: rotate(-90deg) translate3d(0,calc(-100vh + 60px),0); /* 调整变换以匹配新高度 */
   transform-origin: right top;
   overflow-y: auto;
   overflow-x: hidden;
@@ -57,6 +170,7 @@ html, body {
   transform-style: preserve-3d;
   padding-bottom: 10rem;
   padding-left: 5vw; /* 添加左侧填充以防止内容太靠边 */
+  padding-top: 15vh; /* 增加顶部填充以向上移动内容 */
 }
 .hp-gallery .hp-gallery-img-wrapper {
   transform: rotate(90deg);
@@ -66,7 +180,7 @@ html, body {
   min-height: 42vh;
   transform-origin: 50% 50%;
   /* base transform: keep original rotation and a subtle scale */
-  transform: rotate(90deg) translateZ(.1px) scale(0.9) translateX(0px) translateY(-3vh);
+  transform: rotate(90deg) translateZ(.1px) scale(0.9) translateX(0px) translateY(-10vh); /* 向上偏移更多 */
   transition: transform 0.5s cubic-bezier(.2,.9,.2,1), min-height 0.35s ease;
   /* ensure the wrapper allows visible overflow when necessary */
   overflow: visible;
@@ -75,41 +189,41 @@ html, body {
 
 .hp-gallery .hp-gallery-img-wrapper:hover {
   /* increase the wrapper scale so the container expands with the image */
-  transform: rotate(90deg) translateZ(.1px) scale(1.05) translateX(0px) translateY(-3vh);
+  transform: rotate(90deg) translateZ(.1px) scale(1.05) translateX(0px) translateY(-10vh); /* 保持与基本状态相同的垂直偏移 */
   min-height: 70vh; /* increase min-height to accommodate larger image */
   z-index:9999; /* higher to ensure it appears above siblings */
   overflow: visible;
 }
 
 .hp-gallery .hp-gallery-slower {
-  transform: rotate(90deg) translateZ(-.2px) scale(1.1) translateX(0%) translateY(-10vh);
+  transform: rotate(90deg) translateZ(-.2px) scale(1.1) translateX(0%) translateY(-17vh); /* 向上调整 */
 }
 .hp-gallery .hp-gallery-slower1 {
-  transform: rotate(90deg) translateZ(-.25px) scale(1.05) translateX(0%) translateY(8vh);
+  transform: rotate(90deg) translateZ(-.25px) scale(1.05) translateX(0%) translateY(0vh); /* 向上调整 */
 }
 .hp-gallery .hp-gallery-slower2 {
-  transform: rotate(90deg) translateZ(-.3px) scale(1.3) translateX(0%) translateY(2vh);
+  transform: rotate(90deg) translateZ(-.3px) scale(1.3) translateX(0%) translateY(-5vh); /* 向上调整 */
 }
 .hp-gallery .hp-gallery-slower-down {
-  transform: rotate(90deg) translateZ(-.2px) scale(1.1) translateX(0%) translateY(16vh) ;
+  transform: rotate(90deg) translateZ(-.2px) scale(1.1) translateX(0%) translateY(8vh); /* 向上调整 */
 }
 .hp-gallery .hp-gallery-faster {
-  transform: rotate(90deg) translateZ(.15px) scale(0.8) translateX(0%) translateY(14vh) ;
+  transform: rotate(90deg) translateZ(.15px) scale(0.8) translateX(0%) translateY(6vh); /* 向上调整 */
 }
 .hp-gallery .hp-gallery-faster1 {
-  transform: rotate(90deg) translateZ(.05px) scale(0.8) translateX(0%) translateY(10vh) ;
+  transform: rotate(90deg) translateZ(.05px) scale(0.8) translateX(0%) translateY(2vh); /* 向上调整 */
 }
 .hp-gallery .hp-gallery-fastest {
-  transform: rotate(90deg) translateZ(.22px) scale(0.7) translateX(-10vh) translateY(-15vh) ;
+  transform: rotate(90deg) translateZ(.22px) scale(0.7) translateX(-10vh) translateY(-23vh); /* 向上调整 */
 }
 .hp-gallery .hp-gallery-vertical {
-   transform: rotate(90deg) translateZ(-.15px) scale(1.15) translateX(0%) translateY(0%) ;
+   transform: rotate(90deg) translateZ(-.15px) scale(1.15) translateX(0%) translateY(-7vh); /* 向上调整 */
 }
 .hp-gallery .hp-gallery-last {
-  transform: rotate(90deg) translateZ(-.2px) scale(1.1) translateX(35vh) translateY(-8vh);
+  transform: rotate(90deg) translateZ(-.2px) scale(1.1) translateX(35vh) translateY(-15vh); /* 向上调整 */
   /* 增加偏移量，使整个画廊看起来更宽 */
 }
-.hp-gallery .hp-gallery-scroll-info,
+
 .hp-gallery header {
   position: absolute;
   left: 1rem;
@@ -119,9 +233,7 @@ html, body {
 .hp-gallery header {
   bottom: 1rem;
 }
-.hp-gallery .hp-gallery-scroll-info {
-  top: 1rem;
-}
+
 .hp-gallery a {
   color: inherit;
   font-weight: 500;
@@ -196,21 +308,15 @@ html, body {
 .hp-gallery p {
   margin: 0;
 }
-.hp-gallery .hp-gallery-scroll-info {
-  display: flex;
-  align-items: center;
-}
-.hp-gallery .hp-gallery-icon svg {
-    width: 50px;
-    fill: currentcolor;
-}
+
+
 
 /* On touch devices: disable hover enlargement and prevent image link clicks */
 @media (hover: none) and (pointer: coarse) {
   .hp-gallery .hp-gallery-img-wrapper,
   .hp-gallery .hp-gallery-img-wrapper:hover {
     /* keep wrapper at its base size and prevent hover scaling */
-    transform: rotate(90deg) translateZ(.1px) scale(0.9) translateX(0px) translateY(-3vh) !important;
+    transform: rotate(90deg) translateZ(.1px) scale(0.9) translateX(0px) translateY(-10vh) !important; /* 与其他调整保持一致 */
     min-height: 40vh !important;
     z-index: auto !important;
     overflow: visible !important;

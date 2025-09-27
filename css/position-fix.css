@@ -1,0 +1,21 @@
+/* 调整tabber位置的修复样式 */
+.tabber {
+  position: fixed !important;
+  top: 15px !important;
+  right: 15px !important;
+  z-index: 1000 !important;
+}
+
+/* 添加一些美观调整 */
+.tabber {
+  border-radius: 2.5rem !important;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1) !important;
+}
+
+@media (max-width: 768px) {
+  .tabber {
+    position: static !important;
+    margin: 1rem auto 2rem !important;
+    width: max-content !important;
+  }
+}

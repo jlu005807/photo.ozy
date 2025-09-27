@@ -1,0 +1,153 @@
+@import url("https://fonts.googleapis.com/css?family=Concert+One&display=swap");
+
+/* 移除全局样式，只保留必要部分以避免与现有样式冲突 */
+svg {
+  display: none;
+}
+
+/* 主切换按钮容器 */
+.tabber {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  font-family: "Concert One", cursive;
+  z-index: 1000;
+}
+
+/* 标签样式 */
+.tabber label {
+  user-select: none;
+  padding: 1.1rem 1.2rem; /* 缩小按钮内边距，仅改变外形尺寸 */
+  cursor: pointer;
+  will-change: transform;
+  transform: translateZ(0px);
+  transition: transform 125ms ease-in-out, filter 125ms ease-in-out;
+  position: relative;
+  z-index: 2;
+}
+
+.tabber label:hover {
+  transform: scale(1.15);
+}
+
+/* 将右侧文字微调到液体中间位置 */
+.tabber label[for="t2"] {
+  position: relative;
+  left: -8px; /* 向左移动，使文字看起来位于液体中间 */
+  transition: left 180ms ease, transform 180ms ease;
+}
+
+@media (max-width: 768px) {
+  .tabber label[for="t2"] {
+    left: -4px;
+  }
+}
+
+/* 隐藏单选按钮 */
+.tabber input[type="radio"] {
+  display: none;
+}
+
+/* 静态样式 */
+.tabber input#t1 ~ .blob {
+  transform-origin: right center;
+}
+
+.tabber input#t2 ~ .blob {
+  transform-origin: left center;
+}
+
+/* 动画样式 */
+.tabber input#t1:checked ~ .blob {
+  background: cornflowerblue;
+  animation-name: stretchyRev;
+}
+
+.tabber input#t2:checked ~ .blob {
+  background-color: skyblue;
+  animation-name: stretchy;
+}
+
+/* Blob 样式 */
+.tabber .blob {
+  top: 0;
+  left: 0;
+  width: 46%; /* 微调宽度以配合更小的标签 */
+  height: 100%;
+  position: absolute;
+  z-index: -1;
+  border-radius: 1.8rem; /* 缩小圆角 */
+  animation-duration: 0.5s;
+  animation-direction: forwards;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+  transition: transform 150ms ease, background 150ms ease;
+  filter: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" version="1.1"><defs><filter id="goo"><feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" /><feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9" result="goo" /><feComposite in="SourceGraphic" in2="goo" operator="atop"/></filter></defs></svg>#goo');
+}
+
+.tabber .blob:before,
+.tabber .blob:after {
+  display: block;
+  content: "";
+  position: absolute;
+  top: 0;
+  background-color: inherit;
+  height: 100%;
+  width: 50%;
+  border-radius: 100%;
+  transform: scale(1.15);
+  transition: transform 150ms ease;
+  animation-name: pulse;
+  animation-duration: 0.5s;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+.tabber .blob:before {
+  left: 0;
+  animation-delay: 0.15s;
+}
+
+.tabber .blob:after {
+  right: 0;
+}
+
+/* 动画关键帧定义 */
+@keyframes stretchy {
+  0% {
+    transform: translateX(0) scaleX(1);
+  }
+  50% {
+    transform: translateX(0) scaleX(2);
+  }
+  100% {
+    transform: translateX(100%) scaleX(1);
+  }
+}
+
+@keyframes stretchyRev {
+  0% {
+    transform: translateX(100%) scaleX(1);
+  }
+  50% {
+    transform: translateX(0) scaleX(2);
+  }
+  100% {
+    transform: translateX(0) scaleX(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 50% {
+    transform: scaleX(1);
+  }
+  25%, 75% {
+    transform: scaleX(1.5);
+  }
+}
+
+/* 按下效果 */
+.tabber label:active {
+  transform: scale(0.95);
+}
