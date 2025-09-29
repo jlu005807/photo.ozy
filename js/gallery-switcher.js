@@ -302,7 +302,8 @@ document.addEventListener('DOMContentLoaded', function() {
       // 禁用切换控件，防止在收拢动画期间切换视图
       lockControls();
 
-      const { stackMode = 'center', scaleEnd = 0.55, duration = 700, opacityDuration = 450, stagger = 90 } = options;
+      // 拆分为移动与淡出两阶段：moveDuration 控制移动，fadeDuration 控制淡出
+      const { stackMode = 'center', scaleEnd = 0.55, duration = 700, opacityDuration = 450, stagger = 90, moveDuration = duration, fadeDuration = opacityDuration, fadeDelay = 80 } = options;
 
       if (container.dataset.collecting === 'true') {
         resolve();
@@ -348,6 +349,8 @@ document.addEventListener('DOMContentLoaded', function() {
       elements.forEach(el => {
         el.style.transition = '';
         el.style.transitionDelay = '';
+        // 确保在开始时为完全可见
+        el.style.opacity = el.style.opacity || '1';
       });
 
       requestAnimationFrame(() => {
@@ -363,37 +366,59 @@ document.addEventListener('DOMContentLoaded', function() {
             el.style.transition = '';
             el.style.transitionDelay = '';
 
-            const timer = setTimeout(() => {
+            const moveTimer = setTimeout(() => {
               el.style.willChange = 'transform, opacity';
-              el.style.transition = `transform ${duration}ms cubic-bezier(.33, 0, .2, 1), opacity ${opacityDuration}ms ease-out`;
-              el.style.transitionDelay = `${delay}ms`;
+              // 先只做移动（带缩放），不改变 opacity
+              el.style.transition = `transform ${moveDuration}ms cubic-bezier(.33, 0, .2, 1)`;
+              el.style.transitionDelay = '0ms';
               const computed = window.getComputedStyle(el).transform;
               const baseTransform = (computed && computed !== 'none') ? computed + ' ' : '';
+              el.dataset._collectBaseTransform = baseTransform;
+              el.dataset._collectTarget = `translate(${dx}px, ${dy}px) scale(${scaleEnd})`;
+              // 启动移动
               el.style.transform = `${baseTransform}translate(${dx}px, ${dy}px) scale(${scaleEnd})`;
-              el.style.opacity = '0';
-            }, 16);
+              // 当移动完成后再触发淡出
+              const onMoveEnd = (ev) => {
+                if (ev.propertyName !== 'transform') return;
+                el.removeEventListener('transitionend', onMoveEnd);
 
-            cleanupTimers.push(timer);
+                // short timeout to ensure layout settled, 然后开始淡出
+                const fadeStarter = setTimeout(() => {
+                  // 设置淡出过渡，只影响 opacity（也可以再微微缩放以增强效果）
+                  el.style.transition = `opacity ${fadeDuration}ms ease-out`;
+                  // 开始淡出
+                  el.style.opacity = '0';
 
-            const handleTransitionEnd = (event) => {
-              if (event.propertyName !== 'transform') return;
-              el.removeEventListener('transitionend', handleTransitionEnd);
-              remaining -= 1;
-              if (remaining === 0) {
-                finish();
-              }
-            };
+                  const onFadeEnd = (fe) => {
+                    if (fe.propertyName !== 'opacity') return;
+                    el.removeEventListener('transitionend', onFadeEnd);
+                    // 完成一个元素的退场
+                    remaining -= 1;
+                    if (remaining === 0) {
+                      finish();
+                    }
+                  };
 
-            el.addEventListener('transitionend', handleTransitionEnd);
+                  el.addEventListener('transitionend', onFadeEnd);
+                }, fadeDelay);
+
+                cleanupTimers.push(fadeStarter);
+              };
+
+              el.addEventListener('transitionend', onMoveEnd);
+            }, delay + 16);
+
+            cleanupTimers.push(moveTimer);
           });
         });
       });
 
+      // 兜底清理，防止 transitionend 未触发
       const guardTimer = setTimeout(() => {
         if (container.dataset.collecting === 'true') {
           finish();
         }
-      }, duration + stagger * elements.length + 240);
+      }, moveDuration + fadeDuration + stagger * elements.length + 400);
 
       cleanupTimers.push(guardTimer);
     });
