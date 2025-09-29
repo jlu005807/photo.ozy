@@ -13,22 +13,45 @@ svg {
   justify-content: stretch;
   font-family: "Concert One", cursive;
   z-index: 1000;
+  /* responsive variables */
+  --tab-font: clamp(0.85rem, 2.8vw, 1.05rem);
+  --tab-pad-y: clamp(0.38rem, 1.4vw, 1.1rem);
+  --tab-pad-x: clamp(0.6rem, 3.2vw, 1.2rem);
+}
+
+/* 固定到右上角 */
+.tabber {
+  position: fixed;
+  top: clamp(12px, 2.2vh, 20px);
+  right: clamp(12px, 2.2vw, 20px);
+  background: transparent;
+  padding: 4px;
+  border-radius: 12px;
 }
 
 /* 标签样式 */
 .tabber label {
   user-select: none;
-  padding: 1.1rem 1.2rem; /* 缩小按钮内边距，仅改变外形尺寸 */
+  font-size: var(--tab-font);
+  padding: var(--tab-pad-y) var(--tab-pad-x); /* 使用响应式内边距 */
   cursor: pointer;
   will-change: transform;
   transform: translateZ(0px);
   transition: transform 125ms ease-in-out, filter 125ms ease-in-out;
   position: relative;
   z-index: 2;
+  box-sizing: border-box;
+  flex: 0 1 auto; /* allow shrinking but prevent taking full width */
+  white-space: nowrap; /* prevent label text wrapping */
 }
 
 .tabber label:hover {
-  transform: scale(1.15);
+  transform: scale(1.12);
+}
+
+/* 在小屏幕上限制 hover 缩放，避免触碰时过大 */
+@media (max-width: 480px), (orientation: portrait) {
+  .tabber label:hover { transform: scale(1.06); }
 }
 
 /* 将右侧文字微调到液体中间位置 */
@@ -39,8 +62,50 @@ svg {
 }
 
 @media (max-width: 768px) {
+  /* On narrow screens avoid nudging the right label which can lead to centering */
   .tabber label[for="t2"] {
-    left: -4px;
+    left: 0;
+  }
+
+  .tabber {
+    justify-content: flex-start; /* keep tabs aligned rather than jumping to center */
+    gap: 0.5rem;
+    padding: 0 0.6rem;
+  }
+
+  .tabber label {
+    /* slightly reduce padding on small screens to avoid overly large buttons */
+    padding: calc(var(--tab-pad-y) * 0.75) calc(var(--tab-pad-x) * 0.75);
+    font-size: calc(var(--tab-font) * 0.95);
+  }
+
+  /* 在非常窄的屏幕上，将切换按钮竖直堆叠以节省水平空间 */
+  @media (max-width: 420px) {
+    .tabber {
+      /* Keep horizontal but compact for very small screens */
+      flex-direction: row;
+      align-items: center;
+      gap: 0.35rem;
+      right: 8px;
+      top: 8px;
+      padding: 4px;
+      border-radius: 10px;
+      background: rgba(0,0,0,0.04);
+    }
+    .tabber label {
+      padding: 0.32rem 0.6rem;
+      font-size: calc(var(--tab-font) * 0.92);
+      line-height: 1;
+    }
+    /* Ensure the liquid blob remains visible but scaled down */
+    .tabber .blob {
+      display: block;
+      width: clamp(32%, 42%, 48%);
+      height: 100%;
+      border-radius: 1rem;
+      opacity: 0.98;
+      filter: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" version="1.1"><defs><filter id="goo"><feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur" /><feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" /><feComposite in="SourceGraphic" in2="goo" operator="atop"/></filter></defs></svg>#goo');
+    }
   }
 }
 
@@ -73,11 +138,11 @@ svg {
 .tabber .blob {
   top: 0;
   left: 0;
-  width: 46%; /* 微调宽度以配合更小的标签 */
+  width: clamp(36%, 46%, 56%); /* 响应式宽度，避免在狭窄屏幕上占太多 */
   height: 100%;
   position: absolute;
   z-index: -1;
-  border-radius: 1.8rem; /* 缩小圆角 */
+  border-radius: 1.2rem; /* 更适中的圆角 */
   animation-duration: 0.5s;
   animation-direction: forwards;
   animation-iteration-count: 1;
@@ -150,4 +215,16 @@ svg {
 /* 按下效果 */
 .tabber label:active {
   transform: scale(0.95);
+}
+
+/* 当控件被锁定（动画中）时的样式提示 */
+.tabber.controls-disabled label {
+  opacity: 0.6;
+  pointer-events: none;
+  cursor: not-allowed;
+  filter: grayscale(30%);
+}
+
+.tabber.controls-disabled .blob {
+  filter: grayscale(60%) blur(0.6px);
 }

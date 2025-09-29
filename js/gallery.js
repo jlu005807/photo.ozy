@@ -83,6 +83,20 @@ document.addEventListener('DOMContentLoaded', function() {
       e.stopPropagation();
     });
   }
+
+  // 为视差画廊添加点击委托，使 .hp-gallery-img-wrapper 点击也能打开 lightbox
+  const parallaxShell = document.querySelector('.hp-gallery-horizontal-scroll-wrapper');
+  if (parallaxShell) {
+    parallaxShell.addEventListener('click', function (e) {
+      const wrapper = e.target.closest('.hp-gallery-img-wrapper');
+      if (!wrapper) return;
+      // 图片可能在 .hp-figure > a > img
+      const img = wrapper.querySelector('img');
+      const caption = wrapper.querySelector('.hp-caption');
+      if (img && img.src) displayImage(img.src, img.alt, caption ? caption.textContent : '');
+      e.stopPropagation();
+    });
+  }
   
   // 关闭lightbox函数
   function closeLightbox() {

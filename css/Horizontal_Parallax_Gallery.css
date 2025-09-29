@@ -185,6 +185,7 @@ body.parallax-active {
   /* ensure the wrapper allows visible overflow when necessary */
   overflow: visible;
   margin: 0 1.5vh; /* 增加水平间距 */
+  cursor: pointer; /* 显示可点击的指针 */
 }
 
 .hp-gallery .hp-gallery-img-wrapper:hover {
@@ -193,6 +194,7 @@ body.parallax-active {
   min-height: 70vh; /* increase min-height to accommodate larger image */
   z-index:9999; /* higher to ensure it appears above siblings */
   overflow: visible;
+  cursor: pointer; /* reinforce pointer on hover */
 }
 
 .hp-gallery .hp-gallery-slower {
@@ -251,6 +253,13 @@ body.parallax-active {
   padding: 1vh ;
   background: transparent; /* remove hard background on dark theme */
   box-shadow: 0 10px 50px rgba(0,0,0,0.5);
+  cursor: pointer; /* anchors inside wrapper should also show pointer even without href */
+}
+
+/* make wrapper keyboard-focusable visual (if you add tabindex in HTML) */
+.hp-gallery .hp-gallery-img-wrapper:focus {
+  outline: 3px solid rgba(255,255,255,0.12);
+  outline-offset: 6px;
 }
 .hp-gallery img {
   max-width: 48vh;

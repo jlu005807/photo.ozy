@@ -26,12 +26,131 @@ body {
   margin: 0;
   padding: 20px 0;
 }
+
+.gallery-real-stack {
+  display: none !important; /* 已取消堆叠预览的视觉显示 */
+}
+
+.gallery-real-stack.visible {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(0.96);
+}
+
+.gallery-real-stack .stack-preview-card {
+  position: absolute;
+  width: clamp(160px, 22vw, 300px);
+  max-height: 64vh;
+  transform-origin: center center;
+  transform: translate(var(--offset-x, 0px), var(--offset-y, 0px)) rotate(var(--rotate, 0deg)) scale(var(--scale, 1));
+  transition: transform 0.38s ease, opacity 0.38s ease;
+  border-radius: 16px;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0.94;
+  box-shadow: 0 28px 50px rgba(0, 0, 0, 0.38);
+  background: rgba(20, 20, 20, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* 窄屏（移动设备）适配：发牌从页面左侧更靠上，堆叠更小 */
+@media (max-width: 600px) {
+  .gallery-real-stack {
+    left: 8%;
+    transform: translate(-8%, -48%) scale(0.68);
+  }
+
+  .gallery-real-stack .stack-preview-card {
+    width: clamp(120px, 36vw, 180px);
+    opacity: 0.98;
+  }
+}
+
+.gallery-real-stack .stack-preview-card.image-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(40, 40, 40, 0.55));
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 14px 16px;
+  box-shadow: 0 28px 52px rgba(0, 0, 0, 0.4);
+  position: relative;
+  z-index: 0;
+}
+
+.gallery-real-stack .stack-preview-card.image-wrapper::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.12), transparent);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.gallery-real-stack .stack-preview-card.hp-figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 18px 20px 16px;
+  background: rgba(18, 18, 18, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.gallery-real-stack .stack-preview-card img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+.gallery-real-stack .stack-preview-card p,
+.gallery-real-stack .stack-preview-card .hp-caption {
+  margin-top: 0.75rem;
+  margin-bottom: 0;
+  padding: 0 1rem 1rem;
+  text-align: center;
+  color: rgba(240, 240, 240, 0.92);
+  font-size: 0.9rem;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.gallery-real-stack .stack-preview-card .hp-gallery-img-wrapper,
+.gallery-real-stack .stack-preview-card .hp-figure {
+  transform: none !important;
+  min-height: auto;
+  box-shadow: none;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.gallery-real-stack .stack-preview-card .hp-gallery-img-wrapper a {
+  padding: 0;
+  box-shadow: none;
+}
+
+.gallery-real-stack .stack-preview-card .hp-gallery-img-wrapper img,
+.gallery-real-stack .stack-preview-card .hp-figure img {
+  max-width: 100%;
+  max-height: 100%;
+  transform: none !important;
+  filter: none !important;
+}
+
+.gallery-real-stack .stack-preview-card .hp-caption {
+  padding: 0.75rem 1rem 1rem;
+}
 h1 {
   color: coral;
   margin-bottom: 2rem;
   text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
+  transition: opacity 0.45s ease, transform 0.45s ease;
 }
-
 h2 {
   color: coral;
   margin: 3rem 0 1.5rem;
@@ -251,6 +370,21 @@ main {
   box-sizing: border-box;
 }
 
+body.parallax-active main {
+  align-items: flex-start;
+}
+
+body.parallax-active main h1 {
+  opacity: 0;
+  transform: translateY(-20px);
+  pointer-events: none;
+}
+
+body:not(.parallax-active) main h1 {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 footer {
   margin-top: 2rem;
   text-align: center;
@@ -262,8 +396,9 @@ footer {
 }
 
 .close-button, .download-button {
-  width: 44px;
-  height: 44px;
+  /* use clamp to scale between mobile and desktop */
+  width: clamp(36px, 6.2vw, 56px);
+  height: clamp(36px, 6.2vw, 56px);
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
@@ -274,6 +409,7 @@ footer {
   transition: transform .15s ease, background-color .15s ease;
   position: relative;
   z-index: 1600;
+  padding: 0.12rem; /* ensure inner icon spacing scales */
 }
 
 .close-button {
@@ -300,8 +436,8 @@ footer {
 .close-button:before, .close-button:after {
   content: '';
   position: absolute;
-  width: 16px;
-  height: 2px;
+  width: clamp(12px, 2.4vw, 18px);
+  height: clamp(2px, 0.45vw, 2.8px);
   background-color: rgba(255, 255, 255, 0.9);
   /* center the cross lines inside the circular button */
   left: 50%;
@@ -323,10 +459,10 @@ footer {
   position: absolute;
   width: 0;
   height: 0;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-top: 8px solid rgba(255, 255, 255, 0.9);
-  top: 8px;
+  border-left: clamp(5px, 1.1vw, 8px) solid transparent;
+  border-right: clamp(5px, 1.1vw, 8px) solid transparent;
+  border-top: clamp(6px, 1.2vw, 10px) solid rgba(255, 255, 255, 0.9);
+  top: clamp(6px, 1.2vw, 10px);
   left: 50%;
   transform: translateX(-50%);
 }
@@ -334,12 +470,21 @@ footer {
 .download-button:after {
   content: '';
   position: absolute;
-  width: 2px;
-  height: 10px;
+  width: clamp(1.2px, 0.28vw, 2.4px);
+  height: clamp(8px, 1.8vw, 12px);
   background-color: rgba(255, 255, 255, 0.9);
-  bottom: 12px;
+  bottom: clamp(8px, 1.6vw, 14px);
   left: 50%;
   transform: translateX(-50%);
+}
+
+/* 在超窄竖屏设备上进一步压缩按钮，防止视觉上过大 */
+@media (max-width: 420px), (orientation: portrait) {
+  .close-button, .download-button {
+    width: clamp(32px, 7.2vw, 40px);
+    height: clamp(32px, 7.2vw, 40px);
+  }
+  .close-button:before, .close-button:after { width: clamp(10px, 2.4vw, 14px); height: 2px; }
 }
 
 

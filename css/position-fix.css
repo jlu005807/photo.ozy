@@ -13,9 +13,29 @@
 }
 
 @media (max-width: 768px) {
+  /* Keep the tabber fixed on small screens to avoid it centering and growing full-width.
+     Make it slightly inset from the top-right and allow vertical stacking at very small widths. */
   .tabber {
-    position: static !important;
-    margin: 1rem auto 2rem !important;
-    width: max-content !important;
+    position: fixed !important;
+    top: 10px !important;
+    right: 10px !important;
+    margin: 0 !important;
+    width: auto !important;
+    max-width: calc(100% - 20px) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 0.4rem !important;
+    background: transparent !important;
+  }
+
+  /* If the viewport is very narrow, keep the tabber compact and allow stacking (handled by toggle_button.css) */
+  @media (max-width: 420px) {
+    .tabber {
+      right: 8px !important;
+      top: 8px !important;
+      padding: 6px !important;
+      background: rgba(0,0,0,0.06) !important;
+    }
   }
 }
