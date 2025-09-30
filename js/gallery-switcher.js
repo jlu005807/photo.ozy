@@ -153,6 +153,33 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
+  // Helper: strip translation components from a transform string (matrix/matrix3d)
+  // 放在文件顶层以便复用，保证在收拢时不受已有 translate 的影响
+  function stripTranslate(transformStr) {
+    if (!transformStr || transformStr === 'none') return '';
+    // matrix(a, b, c, d, tx, ty)
+    const m = transformStr.match(/^matrix\(([^)]+)\)$/);
+    if (m) {
+      const parts = m[1].split(',').map(s => s.trim());
+      if (parts.length === 6) {
+        return `matrix(${parts[0]}, ${parts[1]}, ${parts[2]}, ${parts[3]}, 0, 0)`;
+      }
+    }
+    // matrix3d(...) - zero out last three translation components (indices 12,13,14)
+    const m3 = transformStr.match(/^matrix3d\(([^)]+)\)$/);
+    if (m3) {
+      const parts = m3[1].split(',').map(s => s.trim());
+      if (parts.length === 16) {
+        parts[12] = '0';
+        parts[13] = '0';
+        parts[14] = '0';
+        return `matrix3d(${parts.join(', ')})`;
+      }
+    }
+    // 如果无法解析，返回原始字符串以尽量保留变换（保守策略）
+    return transformStr;
+  }
+
   function playDealAnimation(container, elements, options = {}) {
     if (!container || !elements || elements.length === 0) return;
 
@@ -320,7 +347,15 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
       }
 
-      const origin = getStackPoint(containerRect, stackMode);
+      let origin = getStackPoint(containerRect, stackMode);
+      // 如果传入 forceLeftOrigin，则强制使用视口左中作为 origin（和发牌逻辑一致）
+      if (options && options.forceLeftOrigin) {
+        const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+        const leftX = Math.max(viewportWidth * 0.12, 80);
+        const leftY = viewportHeight * 0.5;
+        origin = { x: leftX, y: leftY };
+      }
       const cardRects = elements.map(el => el.getBoundingClientRect());
 
       container.dataset.collecting = 'true';
@@ -372,11 +407,12 @@ document.addEventListener('DOMContentLoaded', function() {
               el.style.transition = `transform ${moveDuration}ms cubic-bezier(.33, 0, .2, 1)`;
               el.style.transitionDelay = '0ms';
               const computed = window.getComputedStyle(el).transform;
-              const baseTransform = (computed && computed !== 'none') ? computed + ' ' : '';
-              el.dataset._collectBaseTransform = baseTransform;
+              // 使用 stripTranslate 去掉已有的 translate 部分，但保留旋转/缩放
+              const baseNoTranslate = (computed && computed !== 'none') ? stripTranslate(computed) + ' ' : '';
+              el.dataset._collectBaseTransform = baseNoTranslate;
               el.dataset._collectTarget = `translate(${dx}px, ${dy}px) scale(${scaleEnd})`;
-              // 启动移动
-              el.style.transform = `${baseTransform}translate(${dx}px, ${dy}px) scale(${scaleEnd})`;
+              // 启动移动（基于剥离 translate 后的基线）
+              el.style.transform = `${baseNoTranslate}translate(${dx}px, ${dy}px) scale(${scaleEnd})`;
               // 当移动完成后再触发淡出
               const onMoveEnd = (ev) => {
                 if (ev.propertyName !== 'transform') return;
@@ -518,7 +554,11 @@ document.addEventListener('DOMContentLoaded', function() {
       if (activeContainer && activeType) {
         showStackPreview(activeType);
         const activeElements = getGalleryElements(activeType);
-        const collectOptions = COLLECT_CONFIG[activeType] || COLLECT_CONFIG.grid;
+        const collectOptions = Object.assign({}, COLLECT_CONFIG[activeType] || COLLECT_CONFIG.grid);
+        // 如果当前活跃视图是视差，要强制把卡片收拢到页面左侧中间
+        if (activeType === 'parallax') {
+          collectOptions.forceLeftOrigin = true;
+        }
         // 使用按类型获取的 container（例如视差使用 .hp-gallery）以获取正确的 bounding rect
         const realContainer = getGalleryContainer(activeType) || activeContainer;
         await playCollectAnimation(realContainer, activeElements, collectOptions);
