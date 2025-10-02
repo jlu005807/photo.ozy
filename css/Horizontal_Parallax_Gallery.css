@@ -319,16 +319,90 @@ body.parallax-active {
 }
 
 
+@media (max-width: 768px) {
+  .hp-gallery {
+    top: 72px;
+    height: calc(100vh - 72px);
+  }
+
+  .hp-gallery .hp-gallery-external {
+    height: calc(100vh - 72px);
+  }
+
+  .hp-gallery .hp-gallery-horizontal-scroll-wrapper {
+    padding-left: 7vw;
+    padding-top: 11vh;
+    width: calc(100vh - 72px);
+  }
+
+  .hp-gallery .hp-gallery-img-wrapper {
+    min-height: 32vh;
+    margin: 0 0.9vh;
+  }
+
+  .hp-gallery .hp-gallery-img-wrapper:hover {
+    min-height: 38vh !important;
+  }
+
+  .hp-gallery img {
+    max-width: 37vh;
+    max-height: 39vh;
+  }
+
+  .hp-gallery .hp-gallery-scroll-info {
+    bottom: 18px;
+    padding: 8px 12px;
+    font-size: 10px;
+    max-width: 82vw;
+    gap: 8px;
+    border-radius: 40px;
+  }
+
+  .hp-gallery .hp-gallery-scroll-info .hp-gallery-icon {
+    width: 18px;
+    height: 18px;
+    margin: 0 6px;
+  }
+
+  .hp-gallery .hp-gallery-text {
+    font-size: 13px;
+    line-height: 1.2;
+  }
+}
 
 /* On touch devices: disable hover enlargement and prevent image link clicks */
 @media (hover: none) and (pointer: coarse) {
   .hp-gallery .hp-gallery-img-wrapper,
   .hp-gallery .hp-gallery-img-wrapper:hover {
-    /* keep wrapper at its base size and prevent hover scaling */
-    transform: rotate(90deg) translateZ(.1px) scale(0.9) translateX(0px) translateY(-10vh) !important; /* 与其他调整保持一致 */
-    min-height: 40vh !important;
+    /* keep wrapper at a smaller base size on touch screens */
+    min-height: 30vh !important;
+    margin: 0 1vh !important;
     z-index: auto !important;
     overflow: visible !important;
+  }
+
+  .hp-gallery .hp-gallery-horizontal-scroll-wrapper {
+    padding-left: 6vw !important;
+    padding-top: 12vh !important;
+    width: calc(100vh - 70px) !important;
+  }
+
+  .hp-gallery .hp-gallery-scroll-info {
+    bottom: 16px !important;
+    padding: 8px 12px !important;
+    gap: 6px !important;
+    font-size: 5px !important;
+    max-width: 88vw !important;
+  }
+
+  .hp-gallery .hp-gallery-scroll-info .hp-gallery-icon {
+    width: 16px !important;
+    height: 16px !important;
+    margin: 0 4px !important;
+  }
+
+  .hp-gallery .hp-gallery-text {
+    font-size: 12px !important;
   }
 
   /* disable link clicks on images for touch devices to avoid accidental navigation */
@@ -339,6 +413,8 @@ body.parallax-active {
 
   /* remove transitions on images for a static touch experience */
   .hp-gallery img {
+    max-width: 32vh !important;
+    max-height: 34vh !important;
     transition: none !important;
     transform: none !important;
   }
