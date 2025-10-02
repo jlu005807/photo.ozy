@@ -1,0 +1,93 @@
+
+
+.clock {
+  /* 定位到左上角 */
+  position: fixed;
+  top: clamp(12px, 2.2vh, 20px);
+  left: clamp(12px, 2.2vw, 20px);
+  z-index: 1000;
+  
+  /* 调整大小与右上角按钮相匹配 */
+  height: clamp(1.8rem, 3.5vh, 2.5rem);
+  font-size: clamp(1.6rem, 3.2vh, 2.3rem);
+  line-height: clamp(1.8rem, 3.5vh, 2.5rem);
+  
+  /* 保持原有样式 */
+  color: white;
+  font-family: sans-serif;
+  display: flex;
+  overflow: hidden;
+  
+  /* 添加背景和边框使其可见 */
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: clamp(4px, 1vh, 8px) clamp(8px, 1.5vw, 12px);
+}
+
+.clock::before, .clock::after {
+  content: '';
+  width: 100%;
+  height: clamp(0.3rem, 0.6vh, 0.5rem);
+  background: linear-gradient(to top, transparent, rgba(0, 0, 0, 0.3));
+  position: absolute;
+  z-index: 2;
+  left: 0;
+}
+
+.clock::after {
+  bottom: 0;
+  background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.3));
+}
+
+.clock > div {
+  display: flex;
+}
+
+.tick {
+  line-height: clamp(1.8rem, 3.5vh, 2.5rem);
+  padding: 0 clamp(2px, 0.4vw, 4px);
+}
+
+.tick-hidden {
+  opacity: 0;
+}
+
+.move {
+  animation: move linear 1s infinite;
+}
+
+@keyframes move {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(clamp(-1.8rem, -3.5vh, -2.5rem));
+  }
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .clock {
+    font-size: clamp(1.2rem, 3vw, 1.6rem);
+    height: clamp(1.4rem, 3vh, 1.8rem);
+    line-height: clamp(1.4rem, 3vh, 1.8rem);
+    padding: clamp(3px, 0.8vh, 6px) clamp(6px, 1.2vw, 10px);
+  }
+  
+  .tick {
+    line-height: clamp(1.4rem, 3vh, 1.8rem);
+  }
+  
+  @keyframes move {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(clamp(-1.4rem, -3vh, -1.8rem));
+    }
+  }
+}
+

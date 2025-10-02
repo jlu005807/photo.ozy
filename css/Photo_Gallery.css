@@ -203,6 +203,10 @@ h2 {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.75);
+  /* 背景图将通过 JS 动态设置 */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   z-index: 1000;
   display: flex;
   flex-direction: column;
@@ -212,6 +216,32 @@ h2 {
   visibility: hidden;
   pointer-events: none;
   transition: opacity 0.5s cubic-bezier(0.19, 1, 0.22, 1), visibility 0.5s;
+}
+
+/* 添加一个伪元素作为模糊遮罩层 */
+.lightbox::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: inherit;
+  background-size: cover;
+  background-position: center;
+  filter: blur(40px) brightness(0.6);
+  -webkit-filter: blur(40px) brightness(0.6);
+  z-index: -1;
+  opacity: 0.9;
+  transition: opacity 0.3s ease;
+}
+
+/* 移动端降低模糊强度以提升性能 */
+@media (max-width: 768px) {
+  .lightbox::before {
+    filter: blur(20px) brightness(0.6);
+    -webkit-filter: blur(20px) brightness(0.6);
+  }
 }
 
 .lightbox.active {

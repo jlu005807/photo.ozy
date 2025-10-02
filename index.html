@@ -11,9 +11,75 @@
   <link rel="stylesheet" href="css/layout-adjustments.css">
   <link rel="stylesheet" href="css/toggle_button.css">
   <link rel="stylesheet" href="css/position-fix.css">
+  <link rel="stylesheet" href="css/Wall_clock.css">
+  <link rel="stylesheet" href="css/Glowing_Text.css">
 </head>
 
 <body>
+  <!-- 左上角时钟 -->
+  <div class="clock">
+    <div class="hours">
+      <div class="first">
+        <div class="number">0</div>
+      </div>
+      <div class="second">
+        <div class="number">0</div>
+      </div>
+    </div>
+    <div class="tick">:</div>
+    <div class="minutes">
+      <div class="first">
+        <div class="number">0</div>
+      </div>
+      <div class="second">
+        <div class="number">0</div>
+      </div>
+    </div>
+    <div class="tick">:</div>
+    <div class="seconds">
+      <div class="first">
+        <div class="number">0</div>
+      </div>
+      <div class="second">
+        <div class="number">0</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 顶部中间的发光文字（封装到 .gt-wrapper 以避免样式污染） -->
+  <div class="gt-wrapper">
+    <ul>
+      <li>
+        <input type="checkbox" />
+        <div class="gt-text">P</div>
+      </li>
+      <li>
+        <input type="checkbox" />
+        <div class="gt-text">R</div>
+      </li>
+      <li>
+        <input type="checkbox" />
+        <div class="gt-text">A</div>
+      </li>
+      <li>
+        <input type="checkbox" />
+        <div class="gt-text">T</div>
+      </li>
+      <li>
+        <input type="checkbox" />
+        <div class="gt-text">H</div>
+      </li>
+      <li>
+        <input type="checkbox" />
+        <div class="gt-text">A</div>
+      </li>
+      <li>
+        <input type="checkbox" />
+        <div class="gt-text">M</div>
+      </li>
+    </ul>
+  </div>
+
   <main>
     
 
@@ -204,6 +270,10 @@
   <script src="js/swipe-scroll.js" defer></script>
   <!-- 引入画廊切换功能 -->
   <script src="js/gallery-switcher.js"></script>
+  <!-- 引入时钟脚本 -->
+  <script src="js/Wall_clock.js"></script>
+  <!-- 发光文字交互脚本 -->
+  <script src="js/Glowing_Text.js"></script>
 </body>
 
 </html>

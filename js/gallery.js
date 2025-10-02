@@ -56,6 +56,9 @@ document.addEventListener('DOMContentLoaded', function() {
     lightboxImg.src = imgSrc;
     lightboxImg.alt = imgAlt || '';
     
+    // 设置 lightbox 背景为当前图片的模糊版本
+    lightbox.style.backgroundImage = `url('${imgSrc}')`;
+    
     // 显示lightbox
     lightbox.classList.add('active');
     
@@ -101,6 +104,12 @@ document.addEventListener('DOMContentLoaded', function() {
   // 关闭lightbox函数
   function closeLightbox() {
     lightbox.classList.remove('active');
+    // 清除背景图以释放内存
+    setTimeout(function() {
+      if (!lightbox.classList.contains('active')) {
+        lightbox.style.backgroundImage = '';
+      }
+    }, 500); // 等待淡出动画完成后清除
   }
   
   // 点击lightbox背景关闭它

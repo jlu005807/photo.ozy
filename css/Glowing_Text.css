@@ -1,0 +1,95 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@900&display=swap');
+
+/* Scoped glowing text widget: use .gt-wrapper to avoid global pollution */
+.gt-wrapper {
+  position: fixed;
+  left: 50%;
+  top: 12px;
+  transform: translateX(-50%);
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  gap: 6px;
+  background: transparent; /* keep page background unchanged */
+  font-family: 'Poppins', sans-serif;
+}
+
+.gt-wrapper ul {
+  position: relative;
+  display: flex;
+  margin: 0;
+  padding: 0;
+}
+
+.gt-wrapper li {
+  list-style: none;
+}
+
+.gt-wrapper label {
+  position: relative;
+}
+
+.gt-wrapper input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 80px;
+  width: 80px;
+  z-index: 100;
+  /* 不捕获指针，以便下面的 .gt-text 接收 hover 事件 */
+  pointer-events: none;
+}
+
+.gt-wrapper .gt-text {
+  position: relative;
+  height: 80px;
+  width: 80px;
+  background: #18191f;
+  color: #555;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 46px;
+  cursor: pointer;
+  margin: 0 4px;
+  border-radius: 20px;
+  box-shadow: -1px -1px 4px rgba(255, 255, 255, 0.05),
+    4px 4px 6px rgba(0, 0, 0, 0.2),
+    inset -1px -1px 4px rgba(255, 255, 255, 0.05),
+    inset 1px 1px 1px rgba(0, 0, 0, 0.1);
+  /* smooth transitions for color and glow */
+  transition: color 360ms ease, text-shadow 360ms ease, box-shadow 360ms ease, transform 220ms ease;
+}
+
+/* .gt-wrapper .gt-text:before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 75px;
+  height: 38px;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  background: rgba(255, 255, 255, 0.05);
+} */
+
+.gt-wrapper input[type="checkbox"]:checked ~ .gt-text,
+.gt-wrapper .gt-text.glow {
+  box-shadow: inset 0 0 2px rgba(255, 255, 255, 0.05),
+    inset 4px 4px 6px rgba(0, 0, 0, 0.2);
+  color: #18bfef;
+  text-shadow: 0 0 15px #18bfef, 0 0 25px #18bfef;
+  transform: scale(1.02);
+  /* no CSS animation here so fade-in/out uses transitions above */
+}
+
+@keyframes glow {
+  0% {
+    filter: hue-rotate(0deg);
+  }
+  100% {
+    filter: hue-rotate(360deg);
+  }
+}

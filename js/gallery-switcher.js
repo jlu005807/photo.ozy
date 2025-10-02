@@ -42,6 +42,82 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   };
 
+  const MOBILE_DEAL_OVERRIDES = {
+    grid: {
+      duration: 520,
+      opacityDuration: 320,
+      stagger: 56,
+      scaleStart: 0.72
+    },
+    parallax: {
+      duration: 560,
+      opacityDuration: 340,
+      stagger: 60,
+      scaleStart: 0.68
+    }
+  };
+
+  const MOBILE_COLLECT_OVERRIDES = {
+    grid: {
+      duration: 520,
+      opacityDuration: 280,
+      stagger: 56,
+      hold: 120,
+      fadeDelay: 60
+    },
+    parallax: {
+      duration: 560,
+      opacityDuration: 320,
+      stagger: 60,
+      hold: 140,
+      fadeDelay: 70
+    }
+  };
+
+  const mediaQueries = window.matchMedia
+    ? {
+        coarse: window.matchMedia('(pointer: coarse)'),
+        noHover: window.matchMedia('(hover: none)'),
+        small: window.matchMedia('(max-width: 768px)'),
+        reduced: window.matchMedia('(prefers-reduced-motion: reduce)')
+      }
+    : {};
+
+  function shouldSimplifyMotion() {
+    if (!window.matchMedia) {
+      return false;
+    }
+    if (mediaQueries.reduced && mediaQueries.reduced.matches) {
+      return true;
+    }
+    const smallTouch = (mediaQueries.small && mediaQueries.small.matches) && (mediaQueries.noHover && mediaQueries.noHover.matches);
+    if (smallTouch) {
+      return true;
+    }
+    if (mediaQueries.coarse && mediaQueries.coarse.matches) {
+      return true;
+    }
+    return false;
+  }
+
+  function getDealConfig(type, extraOverrides = {}) {
+    const baseConfig = DEAL_CONFIG[type] || DEAL_CONFIG.grid || {};
+    const config = Object.assign({}, baseConfig);
+    if (shouldSimplifyMotion()) {
+      Object.assign(config, MOBILE_DEAL_OVERRIDES[type] || {});
+    }
+    return Object.assign(config, extraOverrides);
+  }
+
+  function getCollectConfig(type, extraOverrides = {}) {
+    const baseConfig = COLLECT_CONFIG[type] || COLLECT_CONFIG.grid || {};
+    const config = Object.assign({}, baseConfig);
+    if (shouldSimplifyMotion()) {
+      Object.assign(config, MOBILE_COLLECT_OVERRIDES[type] || {});
+    }
+    return Object.assign(config, extraOverrides);
+  }
+
   let isSwitching = false;
   let pendingGallery = null;
   // animationLocks 用于在任意动画进行时禁用切换控件
@@ -494,9 +570,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const cards = getGalleryElements(type);
     if (!cards || cards.length === 0) return;
 
-    const config = DEAL_CONFIG[type] || {};
-    // Merge provided options (e.g. forceLeftOrigin) into the config passed to playDealAnimation
-    const merged = Object.assign({}, config, options);
+  const config = getDealConfig(type);
+  // Merge provided options (e.g. forceLeftOrigin) into the config passed to playDealAnimation
+  const merged = Object.assign({}, config, options);
     // Use existing playDealAnimation which expects elements to already have their
     // initial transform positioned at the origin (no-transition). If prepareDealStart
     // was called right after activating the target container, elements will already
@@ -554,7 +630,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (activeContainer && activeType) {
         showStackPreview(activeType);
         const activeElements = getGalleryElements(activeType);
-        const collectOptions = Object.assign({}, COLLECT_CONFIG[activeType] || COLLECT_CONFIG.grid);
+  const collectOptions = getCollectConfig(activeType);
         // 如果当前活跃视图是视差，要强制把卡片收拢到页面左侧中间
         if (activeType === 'parallax') {
           collectOptions.forceLeftOrigin = true;
@@ -587,7 +663,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
       });
 
-      const dealConfig = DEAL_CONFIG[targetGallery] || {};
+  const dealConfig = getDealConfig(targetGallery);
       const cardCount = Math.min(6, getGalleryElements(targetGallery).length || 1);
       const previewDelay = Math.max(520, (dealConfig.duration || 800) + (dealConfig.stagger || 90) * cardCount * 0.55);
       hideStackPreview(previewDelay);
@@ -637,7 +713,7 @@ document.addEventListener('DOMContentLoaded', function() {
         triggerDealAnimation(type);
       }
 
-    const dealConfig = DEAL_CONFIG[type] || {};
+  const dealConfig = getDealConfig(type);
           const cardCount = Math.min(6, getGalleryElements(type).length || 1);
           const previewDelay = Math.max(520, (dealConfig.duration || 800) + (dealConfig.stagger || 90) * cardCount * 0.55);
           hideStackPreview(previewDelay);
