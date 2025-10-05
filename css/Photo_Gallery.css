@@ -8,6 +8,10 @@
   --glass-highlight: rgba(255, 255, 255, 0.05); /* 玻璃高光 */
   --hover-glass-border: rgba(255, 127, 80, 0.4); /* 悬停时的玻璃边框 */
   --hover-glass-highlight: rgba(255, 127, 80, 0.1); /* 悬停时的高光 */
+  /* Lightbox responsive variables */
+  --lb-padding: 22px;
+  --lb-max-width: 90%;
+  --lb-max-height: 85vh;
 }
 
 html {
@@ -207,7 +211,8 @@ h2 {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  z-index: 1000;
+  /* Ensure lightbox always appears above all other UI elements */
+  z-index: 2147483647 !important;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -251,15 +256,15 @@ h2 {
 }
 
 .lightbox-content {
-  --lb-padding: 22px; /* padding variable so buttons can align to visual content */
+  /* padding variable so buttons can align to visual content (adjusted by media queries) */
   background: rgba(30, 30, 30, 0.7); /* 半透明背景 */
   backdrop-filter: blur(15px); /* 背景模糊效果 - 玻璃感 */
   -webkit-backdrop-filter: blur(15px); /* Safari兼容性 */
   border: 1px solid rgba(255, 255, 255, 0.15); /* 玻璃边框 */
   padding: var(--lb-padding);
   border-radius: 20px; /* 更圆的边角 */
-  max-width: 90%; 
-  max-height: 85vh;
+  max-width: var(--lb-max-width);
+  max-height: var(--lb-max-height);
   /* allow absolutely-positioned button container to escape the content box */
   overflow: visible;
   box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
@@ -326,7 +331,7 @@ h2 {
 .lightbox-img {
   display: block; /* 默认显示 */
   max-width: 100%;
-  max-height: 80vh; /* 增加最大高度以显示更大的图片 */
+  max-height: calc(var(--lb-max-height) - (var(--lb-padding) * 2)); /* keep padding accounted */
   width: auto;
   height: auto;
   margin: 0 auto;
@@ -510,11 +515,32 @@ footer {
 
 /* 在超窄竖屏设备上进一步压缩按钮，防止视觉上过大 */
 @media (max-width: 420px), (orientation: portrait) {
+  /* reduce lightbox padding and max dimensions on very small screens */
+  :root {
+    --lb-padding: 12px;
+    --lb-max-width: 96%;
+    --lb-max-height: 76vh;
+  }
   .close-button, .download-button {
     width: clamp(32px, 7.2vw, 40px);
     height: clamp(32px, 7.2vw, 40px);
   }
   .close-button:before, .close-button:after { width: clamp(10px, 2.4vw, 14px); height: 2px; }
+}
+
+/* medium mobile adjustments */
+@media (max-width: 768px) {
+  :root {
+    --lb-padding: 16px;
+    --lb-max-width: 94%;
+    --lb-max-height: 80vh;
+  }
+  .lightbox-content {
+    padding: var(--lb-padding);
+  }
+  .lightbox-img {
+    max-height: calc(var(--lb-max-height) - (var(--lb-padding) * 2));
+  }
 }
 
 

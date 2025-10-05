@@ -6,6 +6,38 @@ document.addEventListener('DOMContentLoaded', function() {
   // 获取所有画廊容器
   const galleryContainers = document.querySelectorAll('.gallery-container');
 
+  // Ensure tabber is visibly offset on narrower screens to avoid overlap with top title.
+  function adjustTabberPosition() {
+    const tabber = document.querySelector('.tabber');
+    if (!tabber) return;
+    const vw = window.innerWidth || document.documentElement.clientWidth;
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+    if (vw <= 960) {
+      // compute a responsive top value within reasonable min/max (match CSS clamp)
+      const min = 64; // px
+      const max = 140; // px
+      const preferred = Math.round(vh * 0.08);
+      const topPx = Math.min(Math.max(preferred, min), max);
+      // apply as inline style with important priority to ensure it overrides CSS
+      tabber.style.setProperty('top', topPx + 'px', 'important');
+    } else if (vw <= 1480) {
+      // for medium screens use a slightly smaller offset
+      const min = 64;
+      const max = 120;
+      const preferred = Math.round(vh * 0.08);
+      const topPx = Math.min(Math.max(preferred, min), max);
+      tabber.style.setProperty('top', topPx + 'px', 'important');
+    } else {
+      // restore default by removing inline top property
+      tabber.style.removeProperty('top');
+    }
+  }
+
+  // initial adjust and on resize/orientation change
+  adjustTabberPosition();
+  window.addEventListener('resize', adjustTabberPosition);
+  window.addEventListener('orientationchange', adjustTabberPosition);
+
   const DEAL_CONFIG = {
     grid: {
       stackMode: 'page-left-center',

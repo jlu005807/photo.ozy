@@ -91,3 +91,19 @@
   }
 }
 
+/* For narrower screens (<=960px) move clock to bottom-left to avoid overlapping top-centered elements */
+@media (max-width: 960px) {
+  .clock {
+    top: auto;
+    left: 8px;
+    right: auto;
+    bottom: 8px;
+    z-index: 1100; /* above many elements but below gt-wrapper if needed */
+    /* keep compact sizing for very small screens */
+    font-size: clamp(1rem, 3vw, 1.4rem);
+    height: clamp(1.2rem, 3vh, 1.6rem);
+    line-height: clamp(1.2rem, 3vh, 1.6rem);
+    padding: 6px 8px;
+  }
+}
+

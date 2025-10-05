@@ -16,6 +16,11 @@
   font-family: 'Poppins', sans-serif;
 }
 
+/* Responsive main size for the glowing buttons. Only affects sizing; layout and proportions remain. */
+:root {
+  --gt-size: clamp(36px, 6.5vw, 128px);
+}
+
 .gt-wrapper ul {
   position: relative;
   display: flex;
@@ -35,8 +40,8 @@
   position: absolute;
   opacity: 0;
   cursor: pointer;
-  height: 80px;
-  width: 80px;
+  height: var(--gt-size);
+  width: var(--gt-size);
   z-index: 100;
   /* 不捕获指针，以便下面的 .gt-text 接收 hover 事件 */
   pointer-events: none;
@@ -44,17 +49,19 @@
 
 .gt-wrapper .gt-text {
   position: relative;
-  height: 80px;
-  width: 80px;
+  height: var(--gt-size);
+  width: var(--gt-size);
   background: #18191f;
   color: #555;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 46px;
+  /* font-size scales to keep the same visual proportion relative to the box */
+  font-size: calc(var(--gt-size) * 0.575);
   cursor: pointer;
-  margin: 0 4px;
-  border-radius: 20px;
+  margin: 0 calc(var(--gt-size) * 0.05);
+  /* border-radius kept proportional */
+  border-radius: calc(var(--gt-size) * 0.25);
   box-shadow: -1px -1px 4px rgba(255, 255, 255, 0.05),
     4px 4px 6px rgba(0, 0, 0, 0.2),
     inset -1px -1px 4px rgba(255, 255, 255, 0.05),

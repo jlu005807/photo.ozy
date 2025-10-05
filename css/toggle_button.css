@@ -5,9 +5,9 @@ svg {
   display: none;
 }
 
-/* 主切换按钮容器 */
+/* 主切换按钮容器（响应变量 + 默认定位） */
 .tabber {
-  position: relative;
+  position: fixed;
   display: flex;
   align-items: stretch;
   justify-content: stretch;
@@ -17,11 +17,7 @@ svg {
   --tab-font: clamp(0.85rem, 2.8vw, 1.05rem);
   --tab-pad-y: clamp(0.38rem, 1.4vw, 1.1rem);
   --tab-pad-x: clamp(0.6rem, 3.2vw, 1.2rem);
-}
-
-/* 固定到右上角 */
-.tabber {
-  position: fixed;
+  /* 默认固定到右上角（可以由 media queries 覆盖） */
   top: clamp(12px, 2.2vh, 20px);
   right: clamp(12px, 2.2vw, 20px);
   background: transparent;
@@ -33,7 +29,8 @@ svg {
 .tabber label {
   user-select: none;
   font-size: var(--tab-font);
-  padding: var(--tab-pad-y) var(--tab-pad-x); /* 使用响应式内边距 */
+  padding: var(--tab-pad-y) var(--tab-pad-x);
+  /* 使用响应式内边距 */
   cursor: pointer;
   will-change: transform;
   transform: translateZ(0px);
@@ -41,34 +38,46 @@ svg {
   position: relative;
   z-index: 2;
   box-sizing: border-box;
-  flex: 0 1 auto; /* allow shrinking but prevent taking full width */
-  white-space: nowrap; /* prevent label text wrapping */
+  flex: 0 1 auto;
+  /* allow shrinking but prevent taking full width */
+  white-space: nowrap;
+  /* prevent label text wrapping */
 }
 
 .tabber label:hover {
   transform: scale(1.12);
 }
 
+
 /* 在小屏幕上限制 hover 缩放，避免触碰时过大 */
-@media (max-width: 480px), (orientation: portrait) {
-  .tabber label:hover { transform: scale(1.06); }
+@media (max-width: 480px),
+(orientation: portrait) {
+  .tabber label:hover {
+    transform: scale(1.06);
+  }
 }
 
 /* 将右侧文字微调到液体中间位置 */
 .tabber label[for="t2"] {
   position: relative;
-  left: -8px; /* 向左移动，使文字看起来位于液体中间 */
+  left: -8px;
+  /* 向左移动，使文字看起来位于液体中间 */
   transition: left 180ms ease, transform 180ms ease;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 960px) {
+  /* Move tabber down for screens <=960px to avoid overlapping the centered title */
+  .tabber {
+    top: clamp(3px, 2vh, 5px);
+  }
   /* On narrow screens avoid nudging the right label which can lead to centering */
   .tabber label[for="t2"] {
     left: 0;
   }
 
   .tabber {
-    justify-content: flex-start; /* keep tabs aligned rather than jumping to center */
+    justify-content: flex-start;
+    /* keep tabs aligned rather than jumping to center */
     gap: 0.5rem;
     padding: 0 0.6rem;
   }
@@ -87,16 +96,17 @@ svg {
       align-items: center;
       gap: 0.35rem;
       right: 8px;
-      top: 8px;
       padding: 4px;
       border-radius: 10px;
-      background: rgba(0,0,0,0.04);
+      background: rgba(0, 0, 0, 0.04);
     }
+
     .tabber label {
       padding: 0.32rem 0.6rem;
-      font-size: calc(var(--tab-font) * 0.92);
+      font-size: calc(var(--tab-font) * 0.6);
       line-height: 1;
     }
+
     /* Ensure the liquid blob remains visible but scaled down */
     .tabber .blob {
       display: block;
@@ -109,27 +119,28 @@ svg {
   }
 }
 
+
 /* 隐藏单选按钮 */
 .tabber input[type="radio"] {
   display: none;
 }
 
 /* 静态样式 */
-.tabber input#t1 ~ .blob {
+.tabber input#t1~.blob {
   transform-origin: right center;
 }
 
-.tabber input#t2 ~ .blob {
+.tabber input#t2~.blob {
   transform-origin: left center;
 }
 
 /* 动画样式 */
-.tabber input#t1:checked ~ .blob {
+.tabber input#t1:checked~.blob {
   background: cornflowerblue;
   animation-name: stretchyRev;
 }
 
-.tabber input#t2:checked ~ .blob {
+.tabber input#t2:checked~.blob {
   background-color: skyblue;
   animation-name: stretchy;
 }
@@ -138,11 +149,13 @@ svg {
 .tabber .blob {
   top: 0;
   left: 0;
-  width: clamp(36%, 46%, 56%); /* 响应式宽度，避免在狭窄屏幕上占太多 */
+  width: clamp(36%, 46%, 56%);
+  /* 响应式宽度，避免在狭窄屏幕上占太多 */
   height: 100%;
   position: absolute;
   z-index: -1;
-  border-radius: 1.2rem; /* 更适中的圆角 */
+  border-radius: 1.2rem;
+  /* 更适中的圆角 */
   animation-duration: 0.5s;
   animation-direction: forwards;
   animation-iteration-count: 1;
@@ -183,9 +196,11 @@ svg {
   0% {
     transform: translateX(0) scaleX(1);
   }
+
   50% {
     transform: translateX(0) scaleX(2);
   }
+
   100% {
     transform: translateX(100%) scaleX(1);
   }
@@ -195,19 +210,25 @@ svg {
   0% {
     transform: translateX(100%) scaleX(1);
   }
+
   50% {
     transform: translateX(0) scaleX(2);
   }
+
   100% {
     transform: translateX(0) scaleX(1);
   }
 }
 
 @keyframes pulse {
-  0%, 50% {
+
+  0%,
+  50% {
     transform: scaleX(1);
   }
-  25%, 75% {
+
+  25%,
+  75% {
     transform: scaleX(1.5);
   }
 }
