@@ -52,7 +52,8 @@ body {
   pointer-events: none;
   opacity: 0.94;
   box-shadow: 0 28px 50px rgba(0, 0, 0, 0.38);
-  background: rgba(20, 20, 20, 0.7);
+  /* 使用更透明的玻璃背景，让页面背景可以透出，同时保留对比度 */
+  background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(20,20,20,0.25));
   border: 1px solid rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -75,7 +76,8 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(40, 40, 40, 0.55));
+  /* 更轻的渐变背景：降低不透明度以便能看到页面背景 */
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(40, 40, 40, 0.28));
   border: 1px solid rgba(255, 255, 255, 0.18);
   padding: 14px 16px;
   box-shadow: 0 28px 52px rgba(0, 0, 0, 0.4);
@@ -128,6 +130,7 @@ body {
   transform: none !important;
   min-height: auto;
   box-shadow: none;
+  /* 保持透明以便页面背景透出 */
   background: transparent;
   border: none;
   padding: 0;
@@ -170,6 +173,7 @@ h2 {
   width: 92%; /* 略微增大宽度以保持边距均衡 */
   margin: 0 auto;
   position: relative; /* 为子元素的定位提供参考 */
+  brackground: rgba(0, 0, 0, 0);
 }
 
 /* 确保图片容器可点击 */
@@ -357,15 +361,20 @@ h2 {
 .grid-container .image-wrapper {
   display: inline-block !important;
   width: 100% !important;
-  border: solid 1px var(--glass-border) !important; /* 玻璃边框 */
-  padding: 12px 14px !important; /* 增加左右填充 */
+  /* 调整边框颜色以更适配深色背景（较低对比以减少刺眼感） */
+  border: solid 1px rgba(255,255,255,0.06) !important; /* 更暗的玻璃边框 */
+  /* 增大内部填充以给图片更多呼吸空间 */
+  padding: 14px 18px !important; /* 增加左右填充 */
   box-shadow: var(--glass-shadow) !important; /* 玻璃阴影 */
   border-radius: 16px !important; /* 更圆的边角增强玻璃感 */
   transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1) !important;
-  background: linear-gradient(135deg, var(--glass-highlight), var(--glass-bg)) !important; /* 渐变背景增强玻璃感 */
-  backdrop-filter: blur(10px) !important; /* 背景模糊效果 - 关键的玻璃效果 */
-  -webkit-backdrop-filter: blur(10px) !important; /* Safari兼容性 */
-  margin: 0 0.6rem 1.8rem 0.6rem !important; /* 增加左右边距，也略微增加下边距 */
+  /* 使用更透明的渐变背景以便页面背景透出，但保留玻璃高光 */
+  background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(40,40,40,0.16)) !important;
+  /* 适度降低模糊强度以兼顾性能与可见度 */
+  backdrop-filter: blur(6px) !important; /* 背景模糊效果 - 轻量化 */
+  -webkit-backdrop-filter: blur(6px) !important; /* Safari兼容性 */
+  /* 增大外边距以扩大图片间隔 */
+  margin: 0 1rem 2.4rem 1rem !important; /* 增加左右边距，也增加下边距 */
   overflow: hidden !important;
   position: relative !important;
   z-index: 1 !important;
@@ -380,7 +389,8 @@ h2 {
   width: 100% !important;
   height: 50% !important; /* 高光只占上半部分 */
   background: linear-gradient(to bottom, var(--glass-highlight), transparent) !important;
-  opacity: 0.3 !important;
+  /* 减弱高光强度，避免完全遮挡背景 */
+  opacity: 0.15 !important;
   pointer-events: none !important; /* 不干扰鼠标事件 */
   z-index: -1 !important;
 }
@@ -388,7 +398,7 @@ h2 {
 /* 悬停效果 - 增强区分度 */
 .grid-container .image-wrapper:hover {
   border-color: rgba(255, 127, 80, 0.8); /* 半透明的珊瑚色边框 */
-  transform: scale(1.03);
+  transform: scale(1.06);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4); /* 半透明阴影 */
   background-color: rgba(51, 51, 51, 0.7); /* 悬停时背景色略深 */
   z-index: 1;
@@ -542,6 +552,69 @@ footer {
     max-height: calc(var(--lb-max-height) - (var(--lb-padding) * 2));
   }
 }
+
+
+
+
+/* ======================================================================
+   强制覆盖：将常见的包装器背景设为完全透明，移除遮罩和模糊，确保页面背景透出
+   这些规则放在文件末尾以提高优先级，并使用 !important 来覆盖现有强样式。
+   ====================================================================== */
+
+/* 常见包装器：图片卡片、堆叠卡片、水平画廊容器 */
+.image-wrapper,
+.gallery-real-stack .stack-preview-card,
+.gallery-real-stack .stack-preview-card.image-wrapper,
+.gallery-real-stack .stack-preview-card .hp-gallery-img-wrapper,
+.hp-gallery-img-wrapper,
+.hp-gallery-horizontal-scroll-wrapper,
+.grid-container .image-wrapper,
+.grid-container .hp-gallery-img-wrapper {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  overflow: visible !important;
+}
+
+/* 移除伪元素高光遮罩 */
+.image-wrapper::before,
+.gallery-real-stack .stack-preview-card.image-wrapper::before,
+.grid-container .image-wrapper::before,
+.hp-gallery-img-wrapper::before {
+  opacity: 0 !important;
+  display: none !important;
+  background: transparent !important;
+  pointer-events: none !important;
+}
+
+/* 确保这些包装器的 z-index 不会遮挡页面背景 */
+.image-wrapper,
+.grid-container .image-wrapper,
+.gallery-real-stack .stack-preview-card,
+.hp-gallery-img-wrapper {
+  z-index: 0 !important;
+}
+
+/* Restore scrollability for the rotated horizontal parallax shell which was
+   inadvertently set to overflow: visible by the global transparent overrides.
+   These rules are intentionally specific and placed at the end to ensure
+   the hp-gallery horizontal scrolling and touch/drag interactions work. */
+#parallax-gallery.active .hp-gallery .hp-gallery-horizontal-scroll-wrapper,
+.hp-gallery .hp-gallery-horizontal-scroll-wrapper {
+  overflow-y: auto !important; /* vertical scroll on the rotated wrapper */
+  overflow-x: hidden !important;
+  pointer-events: auto !important; /* ensure touch/mouse events reach it */
+  -webkit-overflow-scrolling: touch !important; /* smooth native scrolling on iOS */
+  touch-action: pan-y !important; /* hint to browser that vertical panning is expected */
+}
+
+
+/* 注意：上面已包含覆盖常见 wrapper 的透明规则，目的是让页面背景（css/background.css 中的 .background 或 html/body 背景）能透出。
+   如果还看到遮挡，请在浏览器中清除缓存并检查是否有行内样式或其他样式表在页面末尾注入背景/遮罩。 */
+
 
 
 

@@ -5,7 +5,7 @@
   font-family: Hepta Slab, sans-serif;
   font-weight: 500;
   /* switch to dark background and light text for better contrast */
-  background: #121212;
+  background: rgba(0, 0, 0, 0);
   color: #efecdb;
   height: calc(100vh - 60px); /* 减少高度，为顶部按钮留出空间 */
   width: 100vw; /* 使用视口宽度来铺满整个水平方向 */
@@ -42,98 +42,6 @@ body.parallax-active {
   height: 100vh;
 }
 
-/* 导航提示样式 */
-.hp-gallery .hp-gallery-scroll-info {
-  position: fixed;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(0, 0, 0, 0.6);
-  padding: 12px 20px;
-  border-radius: 50px;
-  z-index: 1001;
-  opacity: 0;
-  transition: all 0.5s ease;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  animation: fadeInUp 1s forwards 0.5s;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translate(-50%, 20px);
-  }
-  to {
-    opacity: 0.9;
-    transform: translate(-50%, 0);
-  }
-}
-
-.hp-gallery .hp-gallery-scroll-info:hover {
-  opacity: 1;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-  transform: translate(-50%, -3px);
-}
-
-.hp-gallery .hp-gallery-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  margin: 0 12px;
-  color: rgba(255, 255, 255, 0.9);
-  transition: transform 0.3s ease, color 0.3s ease;
-}
-
-.hp-gallery .hp-gallery-icon svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-  stroke: currentColor;
-}
-
-.hp-gallery .hp-gallery-icon-left {
-  animation: bounceLeft 1.5s infinite alternate;
-}
-
-.hp-gallery .hp-gallery-icon-right {
-  animation: bounceRight 1.5s infinite alternate;
-}
-
-@keyframes bounceLeft {
-  0%, 100% {
-    transform: translateX(0);
-  }
-  50% {
-    transform: translateX(-5px);
-  }
-}
-
-@keyframes bounceRight {
-  0%, 100% {
-    transform: translateX(0);
-  }
-  50% {
-    transform: translateX(5px);
-  }
-}
-
-.hp-gallery .hp-gallery-text {
-  color: white;
-  font-size: 15px;
-  font-weight: 500;
-  letter-spacing: 0.8px;
-  text-align: center;
-  margin: 0 5px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-}
 .hp-gallery * {
   box-sizing: border-box;
 }
@@ -349,33 +257,6 @@ body.parallax-active {
     max-height: 39vh;
   }
 
-  .hp-gallery .hp-gallery-scroll-info {
-    bottom: 18px;
-    padding: 8px 12px;
-    font-size: 10px;
-    max-width: 82vw;
-    gap: 8px;
-    border-radius: 40px;
-    animation-duration: 0.65s;
-    transition-duration: 0.32s;
-  }
-
-  .hp-gallery .hp-gallery-scroll-info .hp-gallery-icon {
-    width: 18px;
-    height: 18px;
-    margin: 0 6px;
-  }
-
-  .hp-gallery .hp-gallery-text {
-    font-size: 13px;
-    line-height: 1.2;
-  }
-
-  .hp-gallery .hp-gallery-icon-left,
-  .hp-gallery .hp-gallery-icon-right {
-    animation-duration: 2.4s;
-    animation-timing-function: ease-in-out;
-  }
 
   .hp-gallery .hp-gallery-img-wrapper {
     transition: transform 0.32s cubic-bezier(.25,.8,.25,1), min-height 0.24s ease;
@@ -399,23 +280,6 @@ body.parallax-active {
     width: calc(100vh - 70px) !important;
   }
 
-  .hp-gallery .hp-gallery-scroll-info {
-    bottom: 16px !important;
-    padding: 8px 12px !important;
-    gap: 6px !important;
-    font-size: 5px !important;
-    max-width: 88vw !important;
-  }
-
-  .hp-gallery .hp-gallery-scroll-info .hp-gallery-icon {
-    width: 16px !important;
-    height: 16px !important;
-    margin: 0 4px !important;
-  }
-
-  .hp-gallery .hp-gallery-text {
-    font-size: 12px !important;
-  }
 
   /* disable link clicks on images for touch devices to avoid accidental navigation */
   .hp-gallery .hp-gallery-img-wrapper a {

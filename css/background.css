@@ -1,0 +1,28 @@
+.background {
+  width: 100%;
+  height: 100%;
+  position: fixed; /* 固定在视口后面 */
+  inset: 0; /* top:0; right:0; bottom:0; left:0 */
+  z-index: -1; /* 保证在页面内容下方 */
+  pointer-events: none;
+  background-color: #111111;
+  background-image: linear-gradient(
+    32deg,
+    rgba(8, 8, 8, 0.74) 30px,
+    transparent
+  );
+  background-size: 60px 60px;
+  background-position: -5px -5px;
+}
+
+/* 备选：将同样的背景应用到 html 和 body，确保没有元素遮挡时也能显示 */
+html.background-applied, html {
+  background-color: #111111;
+  background-image: linear-gradient(32deg, rgba(8,8,8,0.74) 30px, transparent);
+  background-size: 60px 60px;
+  background-position: -5px -5px;
+}
+
+body.background-applied, body {
+  background-color: transparent; /* 保持 body 透明以便 .background 可见，但在某些环境下使用背景到 body */
+}
