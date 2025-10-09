@@ -18,7 +18,8 @@
 
 /* Responsive main size for the glowing buttons. Only affects sizing; layout and proportions remain. */
 :root {
-  --gt-size: clamp(36px, 6.5vw, 128px);
+  /* 缩小整体尺寸：减少最小值、基于 vw 的比例和最大值。所有依赖 --gt-size 的样式会按比例自动调整。 */
+  --gt-size: clamp(28px, 4.8vw, 96px);
 }
 
 .gt-wrapper ul {

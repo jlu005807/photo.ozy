@@ -38,12 +38,6 @@
 
 /* Ensure tabber is nudged down on medium and small screens to avoid overlapping top-centered title.
    These use !important so they reliably override earlier rules and inline styles if needed. */
-@media (max-width: 1480px) {
-  .tabber {
-    top: clamp(64px, 8vh, 120px) !important;
-  }
-}
-
 @media (max-width: 960px) {
   .tabber {
     top: clamp(80px, 10vh, 140px) !important;

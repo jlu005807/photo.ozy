@@ -81,6 +81,8 @@ body.parallax-active {
   padding-top: 15vh; /* 增加顶部填充以向上移动内容 */
 }
 .hp-gallery .hp-gallery-img-wrapper {
+  position: relative; /* establish stacking context for z-index */
+  z-index: 1; /* base layer so neighbors don't overlap by default */
   transform: rotate(90deg);
   display: flex;
   align-items: center;
@@ -94,13 +96,14 @@ body.parallax-active {
   overflow: visible;
   margin: 0 1.5vh; /* 增加水平间距 */
   cursor: pointer; /* 显示可点击的指针 */
+  will-change: transform, z-index; /* hint for smoother hover animation */
 }
 
 .hp-gallery .hp-gallery-img-wrapper:hover {
   /* increase the wrapper scale so the container expands with the image */
   transform: rotate(90deg) translateZ(.1px) scale(1.05) translateX(0px) translateY(-10vh); /* 保持与基本状态相同的垂直偏移 */
   min-height: 70vh; /* increase min-height to accommodate larger image */
-  z-index:9999; /* higher to ensure it appears above siblings */
+  z-index: 99999; /* bring hovered element to the very top */
   overflow: visible;
   cursor: pointer; /* reinforce pointer on hover */
 }
@@ -194,6 +197,20 @@ body.parallax-active {
   backdrop-filter: blur(4px); /* optional: blur behind the overlay for depth */
 }
 
+/* Ensure the inner figure can be brought above siblings when its wrapper is hovered */
+.hp-figure {
+  position: relative;
+  z-index: 2; /* slightly above wrapper base layer */
+}
+
+.hp-figure:hover {
+  z-index: 100000; /* place the figure well above everything when hovered */
+}
+
+.hp-gallery .hp-gallery-img-wrapper:hover .hp-figure:hover {
+  z-index: 100000; /* place the figure well above everything when hovered */
+}
+
 .hp-figure a {
   display: block;
 }
@@ -250,6 +267,7 @@ body.parallax-active {
 
   .hp-gallery .hp-gallery-img-wrapper:hover {
     min-height: 38vh !important;
+    z-index: 100;
   }
 
   .hp-gallery img {

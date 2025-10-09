@@ -12,18 +12,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!tabber) return;
     const vw = window.innerWidth || document.documentElement.clientWidth;
     const vh = window.innerHeight || document.documentElement.clientHeight;
+    // When viewport width is 960px or less, push the tabber down to avoid overlap with the title
     if (vw <= 960) {
-      // compute a responsive top value within reasonable min/max (match CSS clamp)
       const min = 64; // px
       const max = 140; // px
-      const preferred = Math.round(vh * 0.08);
-      const topPx = Math.min(Math.max(preferred, min), max);
-      // apply as inline style with important priority to ensure it overrides CSS
-      tabber.style.setProperty('top', topPx + 'px', 'important');
-    } else if (vw <= 1480) {
-      // for medium screens use a slightly smaller offset
-      const min = 64;
-      const max = 120;
       const preferred = Math.round(vh * 0.08);
       const topPx = Math.min(Math.max(preferred, min), max);
       tabber.style.setProperty('top', topPx + 'px', 'important');
