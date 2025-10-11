@@ -675,11 +675,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
       targetContainer.classList.add('active', 'fade-in');
 
+      // 如果切换到水平视差视图，重置滚动位置到初始状态
+      if (targetGallery === 'parallax') {
+        const horizontalScrollWrapper = targetContainer.querySelector('.hp-gallery-horizontal-scroll-wrapper');
+        if (horizontalScrollWrapper) {
+          horizontalScrollWrapper.scrollTop = 0;
+        }
+      }
+
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          // If switching from grid -> parallax, force the deal origin to left-middle
-          // so the parallax view's distribution starts from the same place as grid.
-          if (activeType === 'grid' && targetGallery === 'parallax') {
+          // 水平视差视图始终从左侧中间发牌，与页面初始化时保持一致
+          if (targetGallery === 'parallax') {
             triggerDealAnimation(targetGallery, { forceLeftOrigin: true });
           } else {
             triggerDealAnimation(targetGallery);
