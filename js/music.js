@@ -22,6 +22,27 @@ document.addEventListener('DOMContentLoaded', function() {
   // 设置默认音量（较低的初始音量，避免声音过大）
   audioElement.volume = 0.4; // 设置为40%的音量
   
+  // 添加音频事件监听器，确保UI状态与音频状态同步
+  audioElement.addEventListener('play', () => {
+    console.log('audio play 事件触发');
+    isPlaying = true;
+    musicPlayer.classList.add('playing');
+  });
+  
+  audioElement.addEventListener('pause', () => {
+    console.log('audio pause 事件触发');
+    isPlaying = false;
+    musicPlayer.classList.remove('playing');
+  });
+  
+  // 处理播放结束的情况（虽然我们设置了循环，但以防万一）
+  audioElement.addEventListener('ended', () => {
+    if (audioElement.loop === false) {
+      isPlaying = false;
+      musicPlayer.classList.remove('playing');
+    }
+  });
+  
   // 记录音乐状态
   let isPlaying = false;
   let fadeInterval = null; // 用于控制淡入淡出效果的计时器
@@ -34,38 +55,57 @@ document.addEventListener('DOMContentLoaded', function() {
     // 确保没有正在进行的淡入淡出
     if (fadeInterval) clearInterval(fadeInterval);
     
+    console.log('fadeIn 被调用');
+    
     // 初始化音量为0
     audioElement.volume = 0;
     
+    // 设置状态（先更新状态，确保用户界面立即响应）
+    isPlaying = true;
+    musicPlayer.classList.add('playing');
+    
     // 开始播放
-    audioElement.play()
-      .then(() => {
-        // 播放成功，设置淡入
-        const volumeStep = maxVolume / fadeSteps;
-        let currentStep = 0;
-        
-        fadeInterval = setInterval(() => {
-          currentStep++;
-          const newVolume = Math.min(volumeStep * currentStep, maxVolume);
-          audioElement.volume = newVolume;
+    const playPromise = audioElement.play();
+    
+    // 播放API返回Promise (如果浏览器支持)
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          console.log('播放成功');
+          // 播放成功，设置淡入
+          const volumeStep = maxVolume / fadeSteps;
+          let currentStep = 0;
           
-          // 淡入完成后清除计时器
-          if (currentStep >= fadeSteps) {
-            clearInterval(fadeInterval);
-            fadeInterval = null;
-          }
-        }, fadeTime / fadeSteps);
-        
-        isPlaying = true;
-        musicPlayer.classList.add('playing');
-        
-        // 如果提示正在显示，更新其内容
-        updateHoverHint();
-      })
-      .catch(error => {
-        console.log('播放失败，可能由于浏览器策略限制：', error);
-        showPlayHint();
-      });
+          fadeInterval = setInterval(() => {
+            currentStep++;
+            const newVolume = Math.min(volumeStep * currentStep, maxVolume);
+            audioElement.volume = newVolume;
+            
+            // 淡入完成后清除计时器
+            if (currentStep >= fadeSteps) {
+              clearInterval(fadeInterval);
+              fadeInterval = null;
+            }
+          }, fadeTime / fadeSteps);
+          
+          // 如果提示正在显示，更新其内容
+          updateHoverHint();
+        })
+        .catch(error => {
+          console.log('播放失败，可能由于浏览器策略限制：', error);
+          
+          // 重置状态，因为播放失败
+          isPlaying = false;
+          musicPlayer.classList.remove('playing');
+          
+          showPlayHint();
+        });
+    } else {
+      // 老旧浏览器不支持Promise API
+      console.log('浏览器不支持Promise API');
+      // 尝试直接设置音量
+      audioElement.volume = maxVolume;
+    }
   }
   
   // 音量淡出效果
@@ -73,10 +113,23 @@ document.addEventListener('DOMContentLoaded', function() {
     // 确保没有正在进行的淡入淡出
     if (fadeInterval) clearInterval(fadeInterval);
     
+    console.log('fadeOut 被调用');
+    
+    // 立即更新状态（确保UI立即响应）
+    isPlaying = false;
+    musicPlayer.classList.remove('playing');
+    
     // 记录当前音量
     const startVolume = audioElement.volume;
     const volumeStep = startVolume / fadeSteps;
     let currentStep = 0;
+    
+    // 如果当前音量接近0，直接暂停
+    if (startVolume < 0.05) {
+      audioElement.pause();
+      audioElement.volume = 0;
+      return;
+    }
     
     fadeInterval = setInterval(() => {
       currentStep++;
@@ -84,15 +137,12 @@ document.addEventListener('DOMContentLoaded', function() {
       audioElement.volume = newVolume;
       
       // 淡出完成后暂停播放并清除计时器
-      if (currentStep >= fadeSteps) {
+      if (currentStep >= fadeSteps || newVolume === 0) {
         audioElement.pause();
         clearInterval(fadeInterval);
         fadeInterval = null;
       }
     }, fadeTime / fadeSteps);
-    
-    isPlaying = false;
-    musicPlayer.classList.remove('playing');
     
     // 如果提示正在显示，更新其内容
     updateHoverHint();
@@ -114,9 +164,32 @@ document.addEventListener('DOMContentLoaded', function() {
   // 添加窗口大小变化监听，以更新提示位置
   window.addEventListener('resize', updateHoverHint);
   
+  // 检查并同步音频状态
+  function checkAndFixAudioState() {
+    // 检查状态是否同步
+    const actuallyPlaying = !audioElement.paused;
+    if (isPlaying !== actuallyPlaying) {
+      console.log('检测到状态不同步，正在修复。isPlaying:', isPlaying, 'audioElement.paused:', audioElement.paused);
+      isPlaying = actuallyPlaying;
+      
+      if (actuallyPlaying) {
+        musicPlayer.classList.add('playing');
+      } else {
+        musicPlayer.classList.remove('playing');
+      }
+    }
+    return actuallyPlaying;
+  }
+  
   // 播放/暂停切换
   function togglePlay() {
-    if (audioElement.paused) {
+    console.log('togglePlay 被调用，当前状态:', isPlaying, 'audioElement.paused:', audioElement.paused);
+    
+    // 先检查并修复状态不一致的问题
+    const actuallyPlaying = checkAndFixAudioState();
+    
+    // 基于修复后的状态决定动作
+    if (!actuallyPlaying) {
       fadeIn();
     } else {
       fadeOut();
@@ -124,7 +197,9 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   // 点击播放器图标时切换播放状态
-  musicPlayer.addEventListener('click', function() {
+  musicPlayer.addEventListener('click', function(e) {
+    // 防止事件冒泡
+    e.stopPropagation();
     togglePlay();
   });
   
@@ -195,15 +270,60 @@ document.addEventListener('DOMContentLoaded', function() {
   // 鼠标悬停显示提示
   musicPlayer.addEventListener('mouseenter', showHoverHint);
   
-  // 触摸开始时短暂显示提示
+  // 触摸相关变量
+  let touchStartTime = 0;
+  let touchEndTime = 0;
+  let isTouchMove = false;
+  
+  // 触摸开始时显示提示
   musicPlayer.addEventListener('touchstart', function(e) {
-    e.preventDefault(); // 阻止触摸事件的默认行为
+    // 记录触摸开始时间
+    touchStartTime = new Date().getTime();
+    isTouchMove = false;
+    
+    // 添加触摸中的类，显示视觉反馈
+    musicPlayer.classList.add('touch-active');
     
     // 显示提示
     showHoverHint();
+  });
+  
+  // 记录是否有移动
+  musicPlayer.addEventListener('touchmove', function() {
+    isTouchMove = true;
+  });
+  
+  // 处理触摸结束
+  musicPlayer.addEventListener('touchend', function(e) {
+    touchEndTime = new Date().getTime();
     
-    // 设置一个定时器，在1.5秒后自动隐藏提示
-    hintTimeout = setTimeout(hideHoverHint, 1500);
+    // 移除触摸中的类
+    musicPlayer.classList.remove('touch-active');
+    
+    // 隐藏提示
+    hideHoverHint();
+    
+    // 如果是短触摸（小于300毫秒）且没有移动，视为点击
+    if ((touchEndTime - touchStartTime < 300) && !isTouchMove) {
+      // 阻止默认事件和冒泡，避免其他事件干扰
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // 延迟执行，确保动画效果能够完成
+      setTimeout(() => {
+        console.log('触摸结束，执行togglePlay');
+        togglePlay();
+      }, 50);
+    }
+  });
+  
+  // 处理触摸取消（例如被系统打断）
+  musicPlayer.addEventListener('touchcancel', function() {
+    // 移除触摸中的类
+    musicPlayer.classList.remove('touch-active');
+    
+    // 隐藏提示
+    hideHoverHint();
   });
   
   // 当鼠标离开音乐图标时隐藏提示

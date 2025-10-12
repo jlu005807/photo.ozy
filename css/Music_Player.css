@@ -11,6 +11,15 @@
   display: flex; /* 确保内容居中 */
   align-items: center;
   justify-content: center;
+  -webkit-tap-highlight-color: transparent; /* 移除移动设备上的默认点击高亮 */
+  touch-action: manipulation; /* 优化触摸行为 */
+}
+
+/* 活动状态样式（适用于触摸设备） */
+.music-player:active .container {
+  transform: scale(0.95);
+  opacity: 0.9;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
 }
 
 /* 播放器容器样式 */
@@ -150,6 +159,18 @@
   0% { box-shadow: 0 0 0 rgba(255,255,255,0.3); }
   50% { box-shadow: 0 0 5px rgba(255,255,255,0.7); }
   100% { box-shadow: 0 0 0 rgba(255,255,255,0.3); }
+}
+
+/* 触摸反馈动画 */
+@keyframes touch-feedback {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.5); }
+  50% { transform: scale(0.95); box-shadow: 0 0 0 5px rgba(255, 255, 255, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+}
+
+/* 触摸中的类 */
+.music-player.touch-active .container {
+  animation: touch-feedback 0.4s ease-out;
 }
 
 /* 播放状态动画增强 */
