@@ -92,7 +92,7 @@
 }
 
 /* For narrower screens (<=2000px) move clock to bottom-left to avoid overlapping top-centered elements */
-@media (max-width: 2000px) {
+@media (max-width: 960px) {
   .clock {
     top: auto;
     left: 8px;

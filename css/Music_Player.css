@@ -1,0 +1,196 @@
+/* 音乐播放器样式 */
+.music-player {
+  position: fixed;
+  top: clamp(12px, 2.2vh, 20px); /* 与时钟顶部对齐 */
+  left: calc(clamp(12px, 2.2vw, 20px) + clamp(1.8rem, 3.5vh, 2.5rem) * 3 + clamp(8px, 1.5vw, 12px) * 2 + 50px); /* 时钟左边距 + 时钟宽度 + 时钟内边距*2 + 间距 */
+  z-index: 1100;
+  width: clamp(36px, 2.8vw, 50px); /* 稍微调整尺寸与时钟高度协调 */
+  height: clamp(36px, 2.8vw, 50px);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex; /* 确保内容居中 */
+  align-items: center;
+  justify-content: center;
+}
+
+/* 播放器容器样式 */
+.music-player .container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  padding: 0;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease, transform 0.5s ease, box-shadow 0.5s ease;
+}
+
+/* 播放状态下容器效果增强 */
+.music-player.playing .container {
+  box-shadow: 0 3px 15px rgba(100, 100, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+/* 唱片及播放臂样式 */
+.music-player .plate {
+  width: 70%;
+  height: 70%;
+  position: relative;
+  z-index: 1;
+}
+
+.music-player .black {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background-color: #212121;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.music-player .border {
+  width: 70%;
+  height: 70%;
+  border: 0.12em solid #0d0d0d;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.music-player .white {
+  width: 40%;
+  height: 40%;
+  background-color: #ddd;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.music-player .center {
+  width: 35%;
+  height: 35%;
+  background-color: #0d0d0d;
+  border-radius: 50%;
+  transition: background-color 0.5s ease;
+}
+
+/* 播放状态下中心点闪烁效果 */
+.music-player.playing .center {
+  background-color: #444;
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.5) inset;
+}
+
+.music-player .player {
+  position: absolute;
+  transform-origin: 10% center;
+  top: 25%;
+  left: 70%;
+  width: 30%;
+  height: 30%;
+  z-index: 2;
+  transition: transform 0.4s ease;
+}
+
+/* 播放臂样式 */
+.music-player .player .rect {
+  width: 80%;
+  height: 15%;
+  background-color: #212121;
+  position: absolute;
+  top: 13%;
+  left: 0;
+  transform-origin: left;
+  transform: rotate(-25deg);
+}
+
+.music-player .player .circ {
+  width: 20%;
+  height: 35%;
+  border-radius: 50%;
+  background-color: #0d0d0d;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* 唱片动画效果 */
+@keyframes rotate-plate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 增强播放臂动画效果 */
+@keyframes rotate-arm {
+  0% { transform: rotate(-25deg); }
+  2% { transform: rotate(0deg); }
+  4% { transform: rotate(-5deg); }
+  6% { transform: rotate(0deg); }
+  100% { transform: rotate(0deg); }
+}
+
+/* 添加脉动效果 */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* 唱片边框闪光效果 */
+@keyframes border-shine {
+  0% { box-shadow: 0 0 0 rgba(255,255,255,0.3); }
+  50% { box-shadow: 0 0 5px rgba(255,255,255,0.7); }
+  100% { box-shadow: 0 0 0 rgba(255,255,255,0.3); }
+}
+
+/* 播放状态动画增强 */
+.music-player.playing .plate .black {
+  animation: rotate-plate 1.8s linear infinite; /* 加快旋转速度 */
+}
+
+.music-player.playing .player .rect {
+  animation: rotate-arm 2s ease-out forwards;
+  box-shadow: 0 0 2px rgba(255,255,255,0.4); /* 添加轻微发光效果 */
+}
+
+.music-player.playing .border {
+  animation: border-shine 3s ease-in-out infinite; /* 边框发光效果 */
+}
+
+.music-player.playing .container {
+  animation: pulse 2s ease-in-out infinite; /* 整体脉动效果 */
+}
+
+/* 媒体查询，随时钟一起移动到左下角 */
+@media (max-width: 960px) {
+  .music-player {
+    top: auto;
+    bottom: 8px; /* 与时钟底部对齐 */
+    left: calc(8px + clamp(1rem, 3vw, 1.4rem) * 3 + 16px + 45px); /* 时钟左边距 + 时钟宽度 + 内边距 + 间距 */
+    width: clamp(32px, 2.5vw, 44px);
+    height: clamp(32px, 2.5vw, 44px);
+  }
+}
+
+/* 小屏幕设备的更小尺寸 */
+@media (max-width: 480px) {
+  .music-player {
+    width: 28px;
+    height: 28px;
+    left: calc(8px + clamp(1rem, 3vw, 1.4rem) * 3 + 16px + 30px); /* 时钟左边距 + 时钟宽度 + 内边距 + 间距(稍微减小) */
+    bottom: 9px; /* 微调底部位置以实现视觉对齐 */
+  }
+  
+  .music-player .container {
+    transform: scale(0.8);
+  }
+}
