@@ -97,8 +97,8 @@ document.addEventListener('DOMContentLoaded', function() {
           // 重置状态，因为播放失败
           isPlaying = false;
           musicPlayer.classList.remove('playing');
-          
-          showPlayHint();
+
+          // showPlayHint();
         });
     } else {
       // 老旧浏览器不支持Promise API
@@ -329,32 +329,32 @@ document.addEventListener('DOMContentLoaded', function() {
   // 当鼠标离开音乐图标时隐藏提示
   musicPlayer.addEventListener('mouseleave', hideHoverHint);
   
-  // 显示播放提示
-  function showPlayHint() {
-    const hint = document.createElement('div');
-    hint.className = 'play-hint';
-    hint.textContent = '点击图标播放音乐';
-    hint.style.cssText = `
-      position: fixed;
-      top: 70px;
-      right: 20px;
-      background: rgba(0,0,0,0.7);
-      color: white;
-      padding: 5px 10px;
-      border-radius: 4px;
-      z-index: 1101;
-      font-size: 12px;
-      opacity: 0;
-      transition: opacity 0.3s;
-    `;
-    document.body.appendChild(hint);
+  // // 显示播放提示
+  // function showPlayHint() {
+  //   const hint = document.createElement('div');
+  //   hint.className = 'play-hint';
+  //   hint.textContent = '点击图标播放音乐';
+  //   hint.style.cssText = `
+  //     position: fixed;
+  //     top: 70px;
+  //     right: 20px;
+  //     background: rgba(0,0,0,0.7);
+  //     color: white;
+  //     padding: 5px 10px;
+  //     border-radius: 4px;
+  //     z-index: 1101;
+  //     font-size: 12px;
+  //     opacity: 0;
+  //     transition: opacity 0.3s;
+  //   `;
+  //   document.body.appendChild(hint);
     
-    setTimeout(() => hint.style.opacity = '1', 100);
-    setTimeout(() => {
-      hint.style.opacity = '0';
-      setTimeout(() => document.body.removeChild(hint), 500);
-    }, 3000);
-  }
+  //   setTimeout(() => hint.style.opacity = '1', 100);
+  //   setTimeout(() => {
+  //     hint.style.opacity = '0';
+  //     setTimeout(() => document.body.removeChild(hint), 500);
+  //   }, 3000);
+  // }
   
   // 尝试自动播放（大多数现代浏览器不允许未经用户交互的自动播放）
   function tryAutoPlay() {
